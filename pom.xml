@@ -1,0 +1,106 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.google.sps</groupId>
+  <artifactId>capstone_project</artifactId>
+  <version>1</version>
+  <packaging>war</packaging>
+
+  <properties>
+    <!-- This project uses Java 8 -->
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <failOnMissingWebXml>false</failOnMissingWebXml>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Provides `mvn package appengine:run` for local testing
+           and `mvn package appengine:deploy` for deploying. -->
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>appengine-maven-plugin</artifactId>
+        <version>2.2.0</version>
+        <configuration>
+          <!-- TODO: set project ID. -->
+          <deploy.projectId>YOUR_PROJECT_ID_HERE</deploy.projectId>
+          <deploy.version>1</deploy.version>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+            <excludes>
+                <exclude>ngapp/**</exclude>
+            </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+            <excludes>
+                <exclude>ngapp/**</exclude>
+            </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.5.0</version>
+        <executions>
+            <execution>
+                <id>npm-install</id>
+                <phase>generate-sources</phase>
+                <configuration>
+                    <workingDirectory>${project.basedir}/src/main/ngapp</workingDirectory>
+                    <executable>npm</executable>
+                    <arguments>
+                        <argument>install</argument>
+                    </arguments>
+                </configuration>
+                <goals>
+                    <goal>exec</goal>
+                </goals>
+            </execution>
+
+            <execution>
+                <id>npm-ng-build</id>
+                <phase>generate-sources</phase>
+                <configuration>
+                    <workingDirectory>${project.basedir}/src/main/ngapp</workingDirectory>
+                    <executable>npm</executable>
+                    <arguments>
+                        <argument>run</argument>
+                        <argument>ng</argument>
+                        <argument>build</argument>
+                        <argument>--base-href=/capstone_project/ng/</argument>
+                    </arguments>
+                </configuration>
+                <goals>
+                    <goal>exec</goal>
+                </goals>
+            </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
