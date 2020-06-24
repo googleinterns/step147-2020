@@ -92,6 +92,7 @@
                         <argument>run</argument>
                         <argument>ng</argument>
                         <argument>build</argument>
+                        <argument>--watch</argument>
                         <argument>--base-href=/capstone_project/ng/</argument>
                     </arguments>
                 </configuration>
@@ -99,6 +100,9 @@
                     <goal>exec</goal>
                 </goals>
             </execution>
+
+
+
         </executions>
       </plugin>
     </plugins>
