@@ -1,0 +1,31 @@
+.chat_list {
+	margin: 0;
+	padding: 12px 10px 4px;
+}
+
+.chat_people {
+	overflow: hidden;
+	clear: both;
+}
+
+.chat_ib {
+	float: left;
+	padding: 0 0 0 7px;
+	width: 88%;
+}
+
+.chat_ib .chat_name {
+	font-size: 18px;
+	margin: 0 0 8px 0;
+}
+
+.chat_ib .chat_preview {
+	font-size: 14px;
+	margin: auto
+}
+
+.inbox_chat {
+	height: 550px;
+	overflow-y: scroll;
+    
+}
