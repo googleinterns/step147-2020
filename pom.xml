@@ -81,7 +81,6 @@
                     <goal>exec</goal>
                 </goals>
             </execution>
-
             <execution>
                 <id>npm-ng-build</id>
                 <phase>generate-sources</phase>
@@ -100,9 +99,6 @@
                     <goal>exec</goal>
                 </goals>
             </execution>
-
-
-
         </executions>
       </plugin>
     </plugins>

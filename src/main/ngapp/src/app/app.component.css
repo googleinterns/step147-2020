@@ -1,0 +1,43 @@
+.container {
+	max-width: 1170px;
+	margin: auto;
+    margin-top: 5%;
+}
+
+.inbox_people {
+	background: none repeat scroll 0 0;
+	float: left;
+	overflow: hidden;
+	width: 35%;
+    height: 80vh;
+	border-right: 1px solid #c4c4c4;
+}
+
+.inbox_msg {
+	border: 1px solid #c4c4c4;
+	clear: both;
+	overflow: hidden;
+    position: relative;
+}
+
+.headind_srch {
+	padding: 4%;
+	overflow: hidden;
+	border-bottom: 1px solid #c4c4c4;
+}
+
+.messaging {
+	padding: 0 0 50px 0;
+}
+
+.mesgs {
+	float: left;
+	padding: 30px 15px 0 25px;
+	width: 60%;
+}
+
+.inbox_chat {
+	height: 80vh;
+	overflow-y: scroll;
+}
+
