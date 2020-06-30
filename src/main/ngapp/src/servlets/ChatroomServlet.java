@@ -33,7 +33,9 @@ import com.google.gson.Gson;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.datastore.v1.PropertyFilter;
 
+FirebaseApp.initializeApp();
 /** Servlet that holds the chatrooms active on this WebApp */
 @WebServlet("/chatroom")
 public class ChatroomServlet extends HttpServlet {
@@ -67,7 +69,7 @@ public class ChatroomServlet extends HttpServlet {
         for (Entity message : results.asIterable()) {
             messagesInChatroom.add(message);
         }
-        
+
         response.setContentType("application/json");
         response.getWriter().println(convertToJsonUsingGson(messagesInChatroom));
     }
