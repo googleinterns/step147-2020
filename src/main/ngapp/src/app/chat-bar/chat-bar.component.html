@@ -1,9 +1,8 @@
 <div class="channels">
-    <div class="chat_list">
-        <div class="chat_people">
-            <div class="chat_ib">
-                <p class ="chat_name"> Mohamed </p>
-                <p class="chat_preview"> This is placeholder text </p>
+    <div class="chat_list" *ngFor="let user of users">
+        <div class="chat_people" (click)="onSelect(user.user_id)">
+            <div class="chat_ib" >
+                <div class ="chat_name"> {{ user.name }} </div>
             </div>
         </div>
     </div>

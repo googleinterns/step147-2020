@@ -10,10 +10,10 @@
           </div>
 
           <div class="inbox_chat">
-              <app-chat-bar></app-chat-bar>
+            <app-chat-bar [users]="users" [currId]="currId" (changeChat)="onChange($event)"></app-chat-bar>
           </div>
         </div>
-        <app-chat-section class="mesgs"></app-chat-section>
+        <app-chat-section class="mesgs" [messages] = "messages" [currId]="currId" (emitMessage) = "onNewMessage($event)"></app-chat-section>
       </div>
     </div>
   </div>
