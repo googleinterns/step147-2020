@@ -3,25 +3,36 @@
 </div>
 
 <div class="msg_history">
-    <li class="message">
-        <div class="incoming_msg">
-            <div class="received_msg">
-                <div class="received_withd_msg">
-                    <p>Incoming Message text</p>
+    <li class="message" *ngFor="let message of messages">
+        <div
+                *ngIf="
+                  message.sender_id !== currId;
+                  then incoming_msg;
+                  else outgoing_msg
+                "
+        ></div>
+        <ng-template #incoming_msg>
+            <div class="incoming_msg">
+                <div class="received_msg">
+                    <div class="received_withd_msg">
+                        <p> {{ message.text }} </p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="outgoing_msg">
-            <div class="sent_msg">
-            <p>Another outgoing text</p>
+        </ng-template>
+        <ng-template #outgoing_msg>
+            <div class="outgoing_msg">
+                <div class="sent_msg">
+                    <p> {{ message.text }} </p>
+                </div>
             </div>
-        </div>
+        </ng-template>
     </li>
 </div>
 <div class="chat_input">
-    <div class = "flex">
-        <input class="form-control input" type="text" placeholder="Type a mesage" name="newMessage">
+    <form class = "flex" (submit)="sendMessage()">
+        <input class="form-control input" type="text" placeholder="Type a mesage" name="newMessage" [(ngModel)]="newMessage">
         <button type="submit" class="btn btn-primary mb-2 send_btn">Send</button>
-    </div>
+    </form>
 </div>
 

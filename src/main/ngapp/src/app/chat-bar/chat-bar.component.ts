@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { User } from '../models/user';
+
 
 @Component({
   selector: 'app-chat-bar',
@@ -6,10 +8,19 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./chat-bar.component.css']
 })
 export class ChatBarComponent implements OnInit {
+  
+  @Output() changeChat: EventEmitter<any> = new EventEmitter();
+
+  @Input() users: User[];
+  @Input() currId: string;
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  onSelect(id){
+      this.changeChat.emit(id);
   }
 
 }

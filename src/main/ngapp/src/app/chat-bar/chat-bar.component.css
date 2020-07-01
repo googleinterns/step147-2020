@@ -1,6 +1,12 @@
 .chat_list {
+	border-bottom: 1px solid #c4c4c4;
 	margin: 0;
-	padding: 12px 10px 4px;
+	padding: 18px 16px 10px;
+}
+
+.chat_list:hover {
+	background-color: #c4c4c4;
+    font-weight: bold;
 }
 
 .chat_people {

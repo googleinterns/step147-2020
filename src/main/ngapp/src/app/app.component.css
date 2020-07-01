@@ -39,5 +39,10 @@
 .inbox_chat {
 	height: 80vh;
 	overflow-y: scroll;
+    cursor: pointer;
+}
+
+inbox_chat:hover{
+    background-color: #c4c4c4;
 }
 
