@@ -6,31 +6,55 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-4 text-center">
-              <img src="https://placeimg.com/128/128/nature">
+              <img src="https://placeimg.com/128/128/nature" />
             </div>
             <div class="col-md-8">
               <form>
+                <input
+                  type="email"
+                  name="email"
+                  class="form-control mb-2"
+                  placeholder="Email"
+                  #userEmail
+                  required
+                  autofocus
+                />
 
-                <input type="email" name="email" class="form-control mb-2" placeholder="Email" #userEmail required autofocus>
+                <input
+                  type="password"
+                  class="form-control mb-2"
+                  placeholder="Password"
+                  #userPW
+                  required
+                />
 
-                <input type="password" class="form-control mb-2" placeholder="Password" #userPW required>
-                
-                <button class="btn btn-lg btn-primary btn-block mb-1" type="submit" (click)="authService.login(userEmail.value, userPW.value) ">
-                    Login
+                <button
+                  class="btn btn-lg btn-primary btn-block mb-1"
+                  type="submit"
+                  (click)="authService.login(userEmail.value, userPW.value)"
+                >
+                  Login
                 </button>
-                <button type="button" class="btn btn-block" type="submit" (click)="authService.sendPasswordResetEmail(userEmail.value) ">
-                    Reset Password
+                <button
+                  type="button"
+                  class="btn btn-block"
+                  type="submit"
+                  (click)="authService.sendPasswordResetEmail(userEmail.value)"
+                >
+                  Reset Password
                 </button>
 
-<!-- 
+                <!--
                 <button type="button" class="btn btn-block" (click)="authService.loginWithGoogle()">
                     <i class="fa fa-google" aria-hidden="true"></i>
                     Login with Google
-                </button> 
+                </button>
 -->
-   
-
               </form>
+              <p>
+                Don't have an account?
+                <a [routerLink]="['/register']"> Sign up here </a>
+              </p>
             </div>
           </div>
         </div>

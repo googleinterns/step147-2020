@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import * as firebase from 'firebase/app';
+import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { User } from 'firebase';
-
+import { Observable } from 'rxjs';
 // import * as auth0 from 'auth0-js';
 
 @Injectable({
@@ -32,7 +34,7 @@ export class AuthService {
       .signInWithEmailAndPassword(email, password)
       .then((res) => {
         console.log('You are Successfully logged in!', res);
-        this.router.navigate(['register']);
+        this.router.navigate(['/chat']);
       })
       .catch((error) => {
         console.log('Something is wrong:', error.message);
@@ -69,7 +71,7 @@ export class AuthService {
         console.log('Password-reset email sent');
       })
       .then(() => {
-        this.router.navigate(['register']);
+        this.router.navigate(['/chat']);
       });
   }
 
@@ -83,11 +85,11 @@ export class AuthService {
     await this.afAuth.signOut();
     localStorage.removeItem('user');
     console.log('successfully logged out');
-    this.router.navigate(['login']);
+    this.router.navigate(['/']);
   }
 
   // Function to check if a user is logged in.
-  get isLoggedIn(): boolean {
+  isLoggedIn(): boolean {
     const user = JSON.parse(localStorage.getItem('user'));
     console.log('checking if user is logged in');
     return user !== null;

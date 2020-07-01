@@ -29,12 +29,17 @@ export class MainComponent implements OnInit {
   }
 
   onChange(e: string) {
-    let chatroom_array = this.chatService.getChatrooms().filter((chatroom) => {
-      if (chatroom.users.includes(e) && chatroom.users.includes(this.currId)) {
-        return chatroom;
-      }
-    });
-    let chat_id = chatroom_array[0].chatroom_id;
+    const chatroomArray: Chatroom[] = this.chatService
+      .getChatrooms()
+      .filter((chatroom) => {
+        if (
+          chatroom.users.includes(e) &&
+          chatroom.users.includes(this.currId)
+        ) {
+          return chatroom;
+        }
+      });
+    let chat_id = chatroomArray[0].chatroom_id;
 
     this.messages = this.chatService
       .getMessages()
@@ -44,5 +49,9 @@ export class MainComponent implements OnInit {
   onNewMessage(e: Message) {
     this.messages.push(e);
     this.chatService.addMessage(e);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }
