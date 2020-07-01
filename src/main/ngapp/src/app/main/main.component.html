@@ -1,0 +1,32 @@
+<div class="content" role="main">
+  <div class="container">
+    <h3 class="text-center">Auto Translating Chat App</h3>
+    <div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch input-group">
+            <input
+              type="text"
+              class="form-control shadow-sm search-bar"
+              placeholder="Search by @username"
+            />
+          </div>
+
+          <div class="inbox_chat">
+            <app-chat-bar
+              [users]="users"
+              [currId]="currId"
+              (changeChat)="onChange($event)"
+            ></app-chat-bar>
+          </div>
+        </div>
+        <app-chat-section
+          class="mesgs"
+          [messages]="messages"
+          [currId]="currId"
+          (emitMessage)="onNewMessage($event)"
+        ></app-chat-section>
+      </div>
+    </div>
+  </div>
+</div>
