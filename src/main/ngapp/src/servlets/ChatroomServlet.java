@@ -94,8 +94,6 @@ public class ChatroomServlet extends HttpServlet {
         String chatroomID = null;
         PreparedQuery chatrooms = database.prepare(query);
         for (Entity chatroom : chatrooms.asIterable()) {
-            Map<String, Value> chatroomDetails = chatroom.getPropertiesMap();
-
             if (chatroom.getProperty("users-in-chatroom").contains(userID)
                 && chatroom.getProperty("users-in-chatroom").contains(request.getParameter("recipient-id")) {
                     chatroomID = chatroomDetails.get("chatroom-id");
@@ -105,7 +103,7 @@ public class ChatroomServlet extends HttpServlet {
 
         if (chatroomID == null) { //make new chatroom
             Entity newChatroom = new Entity("chatroom");
-            String[] chatroomMembers = {userID, recipientID};
+            String[] chatroomMembers = {userID, request.getParameter("recipient-id")};
             newChatroom.setProperty("chatroom-id", database.allocateId(newChatroom));
             newChatroom.setProperty("users-in-chatroom", chatroomMembers);
             chatroomID = newChatroom.getProperty("chatroom-id");
@@ -118,6 +116,12 @@ public class ChatroomServlet extends HttpServlet {
         newMessage.setProperty("sender-id", userID);
         newMessage.setProperty("recipient-id", request.getParameter("recipient-id"));
         newMessage.setProperty("timestamp", System.currentTimeMillis());
+
+        //translation
+        Translate translate = TranslateOptions.getDefaultInstance().getService();
+        Translation translation = translate.translate((String) newMessage.getProperty("text"), Translate.TranslateOption.targetLanguage(request.getParameter("translation-language")));
+        String translatedText = translation.getTranslatedText();
+        newMessage.setProperty("translated-text", translatedText);
 
         database.put(newMessage);
     }
