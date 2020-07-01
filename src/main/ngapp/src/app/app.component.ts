@@ -3,6 +3,11 @@ import { ChatDataService } from './chat-data.service';
 import { User } from './models/user';
 import { Message } from './models/message';
 
+//additon 1
+import { AuthService } from './auth/auth.service';
+import { Router } from '@angular/router';
+//end of addition 1
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -15,7 +20,7 @@ export class AppComponent implements OnInit {
     messages: Message[];
     currId = "e3d39673-e3eb-4002-8374-baff95ccd118";
 
-    constructor(private chatService: ChatDataService ){}
+    constructor(private chatService: ChatDataService, private authService: AuthService, private router: Router){}
 
     ngOnInit(): void{
         this.users = this.chatService.getUsers().filter(user => user.user_id !== this.currId);
