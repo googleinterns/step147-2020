@@ -56,6 +56,15 @@ public class ChatroomServlet extends HttpServlet {
 
         String recipientID = request.getParameter("recipient-id"); // the user whose chat was clicked
 
+        String chatroomID;
+        PreparedQuery chatrooms = database.prepare(query);
+        for (Entity chatroom : chatrooms.asIterable()) {
+            if (chatroom.getProperty("users-in-chatroom").contains(userID)
+                && chatroom.getProperty("users-in-chatroom").contains(recipientID) {
+                    chatroomID = chatroomDetails.get("chatroom-id");
+                    break;
+            }
+        }
         // go through messages and grabs the messages with chatroomID = to the chatroomID passed in
         // then sorts them by timestamp
         Query<Entity> query = Query.newEntityQueryBuilder()
