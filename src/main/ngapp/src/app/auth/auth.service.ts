@@ -4,14 +4,13 @@ import * as firebase from 'firebase/app';
 import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { User } from 'firebase';
-import { Observable } from 'rxjs';
-// import * as auth0 from 'auth0-js';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   user: User;
+
   constructor(public afAuth: AngularFireAuth, public router: Router) {
     this.afAuth.authState.subscribe((user) => {
       if (user) {
@@ -24,47 +23,30 @@ export class AuthService {
   }
 
   //   Login function.
-  //   async login(email: string, password: string) {
-  //     var result = await this.afAuth.signInWithEmailAndPassword(email, password)
-  //     this.router.navigate(['admin/verify-email']);
-  //   }
-
-  login(email: string, password: string) {
+  login(email: string, password: string): void {
     this.afAuth
       .signInWithEmailAndPassword(email, password)
-      .then((res) => {
-        console.log('You are Successfully logged in!', res);
+      .then((res: any) => {
         this.router.navigate(['/chat']);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.log('Something is wrong:', error.message);
       });
   }
 
-  //   login(email: string, password: string) {
-  //     this.angularFireAuth
-  //       .signInWithEmailAndPassword(email, password)
-  //       .then(res => {
-  //         console.log('You are Successfully logged in!');
-  //         this.router.navigate(['admin/verify-email']);
-  //       })
-  //       .catch(err => {
-  //         console.log('Something is wrong:',err.message);
-  //       });
-  //   }
-
   // Registration function.
-  async register(email: string, password: string) {
-    var result = await this.afAuth.createUserWithEmailAndPassword(
-      email,
-      password
-    );
-    this.sendEmailVerification();
-    console.log('You are Successfully registered!', result);
+  register(email: string, password: string) {
+    this.afAuth
+      .createUserWithEmailAndPassword(email, password)
+      .then((res) => {
+        this.sendEmailVerification();
+        console.log('You are Successfully registered!', res);
+      })
+      .catch((err) => console.log('Something is wrong:', error.message));
   }
 
   // Function for sending email verification.
-  async sendEmailVerification() {
+  sendEmailVerification() {
     return this.afAuth.currentUser
       .then((user) => {
         return user.sendEmailVerification();
@@ -81,11 +63,14 @@ export class AuthService {
   }
 
   // Logging out function.
-  async logout() {
-    await this.afAuth.signOut();
-    localStorage.removeItem('user');
-    console.log('successfully logged out');
-    this.router.navigate(['/']);
+  logout() {
+    this.afAuth
+      .signOut()
+      .then((res) => {
+        localStorage.removeItem('user');
+        console.log('successfully logged out');
+      })
+      .catch((err) => console.error(err));
   }
 
   // Function to check if a user is logged in.
@@ -94,67 +79,4 @@ export class AuthService {
     console.log('checking if user is logged in');
     return user !== null;
   }
-
-  // Login with Google.
-  // async loginWithGoogle() {
-  //   await this.afAuth.signInWithPopup(new auth.GoogleAuthProvider());
-  //   this.router.navigate(['admin/register']);
-  // }
-
-  /*
- const provider = new auth.GoogleAuthProvider();
-    const credential = await this.afAuth.auth.signInWithPopup(provider);
-    return this.updateUserData(credential.user);
-
-  */
 }
-
-// import { Injectable } from '@angular/core';
-// import { AngularFireAuth } from "@angular/fire/auth";
-// import { Observable } from 'rxjs';
-// import { User } from  'firebase';
-// import { Router } from  "@angular/router";
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-
-// export class AuthService {
-//   userData: Observable<firebase.User>;
-
-//   constructor(private angularFireAuth: AngularFireAuth, public router: Router) {
-//     this.userData = angularFireAuth.authState;
-//   }
-
-//   /* Sign up */
-//   register(email: string, password: string) {
-//     this.angularFireAuth
-//       .createUserWithEmailAndPassword(email, password)
-//       .then(res => {
-//         console.log('You are Successfully signed up!', res);
-//       })
-//       .catch(error => {
-//         console.log('Something is wrong:', error.message);
-//       });
-//   }
-
-//   /* Sign in */
-//   login(email: string, password: string) {
-//     this.angularFireAuth
-//       .signInWithEmailAndPassword(email, password)
-//       .then(res => {
-//         console.log('You are Successfully logged in!');
-//         this.router.navigate(['admin/verify-email']);
-//       })
-//       .catch(err => {
-//         console.log('Something is wrong:',err.message);
-//       });
-//   }
-
-//   /* Sign out */
-//   logout() {
-//     this.angularFireAuth
-//       .signOut();
-//   }
-
-// }
