@@ -31,7 +31,7 @@
                 <button
                   class="btn btn-lg btn-primary btn-block mb-1"
                   type="submit"
-                  (click)="authService.login(userEmail.value, userPW.value)"
+                  (click)="login(userEmail.value, userPW.value)"
                 >
                   Login
                 </button>
@@ -39,17 +39,10 @@
                   type="button"
                   class="btn btn-block"
                   type="submit"
-                  (click)="authService.sendPasswordResetEmail(userEmail.value)"
+                  (click)="sendPasswordResetEmail(userEmail.value)"
                 >
                   Reset Password
                 </button>
-
-                <!--
-                <button type="button" class="btn btn-block" (click)="authService.loginWithGoogle()">
-                    <i class="fa fa-google" aria-hidden="true"></i>
-                    Login with Google
-                </button>
--->
               </form>
               <p>
                 Don't have an account?

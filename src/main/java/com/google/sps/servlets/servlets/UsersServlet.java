@@ -34,33 +34,46 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.datastore.v1.PropertyFilter;
+import com.google.sps.servlets.User;
 
 FirebaseApp.initializeApp();
 /** Servlet that holds the users on this WebApp */
 @WebServlet("/users")
 public class UsersServlet extends HttpServlet {
-
-    private DatastoreService database = DatastoreServiceFactory.getDatastoreService();
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String userID;
+
         try {
             String authenticationToken = request.getHeader("auth-token");  
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            String userID = decodedToken.getUid();
-        } catch (FirebaseAuthException e) {
+            userID = decodedToken.getUid();
+        }catch (FirebaseAuthException e) {
             System.out.println("Failure");
             return;
         }
         
-        Query query = new Query("user").addSort("user-id", SortDirection.ASCENDING);
-        PreparedQuery results = datastore.prepare(query);
+        Query query = new Query("user");
+        PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
 
-        ArrayList<String> users = new ArrayList<String>();
+        ArrayList<User> users = new ArrayList<User>();
+
         for (Entity user : results.asIterable()) {
-            users.add(user);
+           String userId = (String) user.getProperty("userId");
+           String name = (String) user.getProperty("name");
+           String email = (String) user.getProperty("email");
+           String language = (String) user.getProperty("language");
+
+           User userInstance = new User(userId, name, email, language);
+
+           if(userInstance.userId != userID){
+               users.add(userInstance);
+           }
+
         }
 
+        Gson gson = new Gson();
+
         response.setContentType("application.json");
-        response.getWriter().println(users);
+        response.getWriter().println(gson.toJson(users));
 }

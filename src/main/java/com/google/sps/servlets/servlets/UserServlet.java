@@ -34,6 +34,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.datastore.v1.PropertyFilter;
+import com.google.sps.servlets.User;
 
 FirebaseApp.initializeApp();
 /** Servlet that holds the users on this WebApp */
@@ -45,35 +46,39 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String userID;
         try {
             String authenticationToken = request.getHeader("auth-token");  
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
+            userID = decodedToken.getUid();
         } catch (FirebaseAuthException e) {
             System.out.println("Failure");
             return;
         }
 
-        String userID = decodedToken.getUid();
-
         Query<Entity> query = Query.newEntityQueryBuilder()
             .setKind("user")
-            .setFilter(PropertyFilter.eq(userID))
+            .setFilter(PropertyFilter.eq("userId", userID))
             .build();
         
         // this should be one user in the query since I specifically
         // specified by the userID which is unique
         PreparedQuery user = database.prepare(query);
+        User userInstance = new User(user.getProperty("userId"), user.getProperty("name"), user.getProperty("email"), user.getProperty("language"));
+
+        Gson gson = new Gson();
 
         response.setContentType("application/json");
-        response.getWriter.println(convertToJsonUsingGson(user));
+        response.getWriter.println(gson.toJson(userInstance));
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String userID;
         try {
             String authenticationToken = request.getHeader("auth-token");  
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            String userID = decodedToken.getUid();
+            userID = decodedToken.getUid();
         } catch (FirebaseAuthException e) {
             System.out.println("Failure");
             return;
@@ -83,17 +88,11 @@ public class UserServlet extends HttpServlet {
         User userInput = new Gson().fromJson(jsonString, User.class);
 
         Entity newUser = new Entity("user");
-        newUser.setProperty("user-id", userInput.userID);
+        newUser.setProperty("userId", userID);
         newUser.setProperty("name", userInput.name);
         newUser.setProperty("email", userInput.email);
-        newUser.setProperty("preferred-language", userInput.preferredLanguage);
+        newUser.setProperty("preferred-language", userInput.language);
 
-        database.put(convertToJsonUsingGson(newUser));
-    }
-
-    private String convertToJsonUsingGson(Object list) {
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        return json;
+        database.put(newUser);
     }
 }
