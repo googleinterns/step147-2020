@@ -1,19 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-//import * as auth0 from 'auth0-js';
-
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
+  constructor(private authService: AuthService, private router: Router) {}
 
-  constructor(public authService: AuthService, private router: Router) { }
+  ngOnInit(): void {}
 
-  ngOnInit(): void {
+  login(email: string, password: string): void {
+    this.authService.login(email, password);
   }
 
+  sendPasswordResetEmail(email: string) {
+    this.authService.sendPasswordResetEmail(email);
+  }
 }
