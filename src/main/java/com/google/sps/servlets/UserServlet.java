@@ -46,15 +46,15 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String userID;
-        try {
-            String authenticationToken = request.getHeader("auth-token");  
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            userID = decodedToken.getUid();
-        } catch (FirebaseAuthException e) {
-            System.out.println("Failure");
-            return;
-        }
+        String userID = request.getParameter("userId");
+        // try {
+        //     String authenticationToken = request.getHeader("auth-token");  
+        //     FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
+        //     userID = decodedToken.getUid();
+        // } catch (FirebaseAuthException e) {
+        //     System.out.println("Failure");
+        //     return;
+        // }
 
         Query<Entity> query = Query.newEntityQueryBuilder()
             .setKind("user")
@@ -74,15 +74,15 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String userID;
-        try {
-            String authenticationToken = request.getHeader("auth-token");  
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            userID = decodedToken.getUid();
-        } catch (FirebaseAuthException e) {
-            System.out.println("Failure");
-            return;
-        }
+        String userID = request.getParameter("userId");
+        // try {
+        //     String authenticationToken = request.getHeader("auth-token");  
+        //     FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
+        //     userID = decodedToken.getUid();
+        // } catch (FirebaseAuthException e) {
+        //     System.out.println("Failure");
+        //     return;
+        // }
         
         String jsonString = IOUtils.toString(request.getInputStream());
         User userInput = new Gson().fromJson(jsonString, User.class);

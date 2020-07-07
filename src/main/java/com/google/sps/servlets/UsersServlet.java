@@ -42,16 +42,16 @@ FirebaseApp.initializeApp();
 public class UsersServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String userID;
+        String userID = request.getParameter("userId");
 
-        try {
-            String authenticationToken = request.getHeader("auth-token");  
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            userID = decodedToken.getUid();
-        }catch (FirebaseAuthException e) {
-            System.out.println("Failure");
-            return;
-        }
+        // try {
+        //     String authenticationToken = request.getHeader("auth-token");  
+        //     FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
+        //     userID = decodedToken.getUid();
+        // } catch (FirebaseAuthException e) {
+        //     System.out.println("Failure");
+        //     return;
+        // }
         
         Query query = new Query("user");
         PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
@@ -69,11 +69,11 @@ public class UsersServlet extends HttpServlet {
            if(userInstance.userId != userID){
                users.add(userInstance);
            }
-
         }
 
         Gson gson = new Gson();
 
         response.setContentType("application.json");
         response.getWriter().println(gson.toJson(users));
+    }
 }
