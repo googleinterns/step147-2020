@@ -20,6 +20,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.datastore.v1.PropertyFilter;
+import com.google.sps.servlets.User;
 import com.google.gson.Gson;
 import java.util.HashMap;
 import java.io.BufferedReader;
@@ -29,12 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.Gson;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.datastore.v1.PropertyFilter;
-import com.google.sps.servlets.User;
+
 
 FirebaseApp.initializeApp();
 /** Servlet that holds the users on this WebApp */

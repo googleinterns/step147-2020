@@ -30,10 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.Gson;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
 import com.google.datastore.v1.PropertyFilter;
 import com.google.sps.servlets.Message;
 
@@ -65,7 +61,7 @@ public class ChatroomServlet extends HttpServlet {
         PreparedQuery chatrooms = database.prepare(chatroomQuery);
 
         for (Entity chatroom : chatrooms.asIterable()) {
-            if (chatroom.getProperty("users").contains(userID) && chatroom.getProperty("users").contains(recipientID) {
+            if (chatroom.getProperty("users").contains(userID) && chatroom.getProperty("users").contains(recipientID)) {
                     chatroomID = chatroom.get("chatroomId");
                     break;
             }
@@ -116,7 +112,7 @@ public class ChatroomServlet extends HttpServlet {
         PreparedQuery chatrooms = database.prepare(query);
 
         for (Entity chatroom : chatrooms.asIterable()) {
-            if (chatroom.getProperty("users").contains(userID) && chatroom.getProperty("users").contains(recipientID) {
+            if (chatroom.getProperty("users").contains(userID) && chatroom.getProperty("users").contains(recipientID)) {
                     chatroomID = chatroom.get("chatroomId");
                     break;
             }

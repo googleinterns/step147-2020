@@ -4,11 +4,20 @@ import * as firebase from 'firebase/app';
 import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { User } from 'firebase';
+import { ThrowStmt } from '@angular/compiler';
+import { BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+
+  private eventAuthError = new BehaviorSubject<string>("");
+  eventAuthError$ = this.eventAuthError.asObservable();
+  newUser: any;
+
   user: User;
 
   constructor(public afAuth: AngularFireAuth, public router: Router) {
@@ -22,7 +31,7 @@ export class AuthService {
     });
   }
 
-  //   Login function.
+  // Login function.
   login(email: string, password: string): void {
     this.afAuth
       .signInWithEmailAndPassword(email, password)
@@ -35,14 +44,14 @@ export class AuthService {
   }
 
   // Registration function.
-  register(email: string, password: string) {
+  register(user) {
     this.afAuth
-      .createUserWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(user.email, user.password)
       .then((res) => {
         this.sendEmailVerification();
         console.log('You are Successfully registered!', res);
       })
-      .catch((err) => console.log('Something is wrong:', error.message));
+      .catch((error: any) => console.log('Something is wrong:', error.message ));
   }
 
   // Function for sending email verification.

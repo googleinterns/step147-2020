@@ -1,3 +1,12 @@
+@import "~bootstrap/dist/css/bootstrap.min.css";
+.col-12 {
+    margin-left: 50px;
+    position: relative;
+}
+.row {
+    max-width: 600px;
+}
+
 /* .card {
     font-family: 'Times New Roman';
     flex-direction: column;
