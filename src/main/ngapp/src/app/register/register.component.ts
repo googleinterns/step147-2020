@@ -11,9 +11,19 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
 
+  authError: any;
+
+
   constructor(public authService: AuthService, private router: Router) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.authService.eventAuthError$.subscribe( data => {
+      this.authError = data;
+    })
+  }
+
+  createUser(frm) {
+    this.authService.createUser(frm.value);
   }
 
 }
