@@ -4,12 +4,9 @@ import * as firebase from 'firebase/app';
 import { auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { User } from 'firebase';
-
-import { AngularFireDatabase } from '@angular/fire/database';
 import { ThrowStmt } from '@angular/compiler';
 import { BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs';
-
 
 
 @Injectable({
@@ -23,7 +20,7 @@ export class AuthService {
 
   user: User;
 
-  constructor(public afAuth: AngularFireAuth, public router: Router, public db: AngularFireDatabase) {
+  constructor(public afAuth: AngularFireAuth, public router: Router) {
     this.afAuth.authState.subscribe((user) => {
       if (user) {
         this.user = user;
@@ -47,9 +44,9 @@ export class AuthService {
   }
 
   // Registration function.
-  register(email: string, password: string) {
+  register(user) {
     this.afAuth
-      .createUserWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(user.email, user.password)
       .then((res) => {
         this.sendEmailVerification();
         console.log('You are Successfully registered!', res);
@@ -90,43 +87,5 @@ export class AuthService {
     const user = JSON.parse(localStorage.getItem('user'));
     console.log('checking if user is logged in');
     return user !== null;
-  }
-
- // Creates a new user (works like registration).
-  async createUser(user) {
-    console.log(user);
-    // Does the registration of the new user.
-    this.afAuth.createUserWithEmailAndPassword( user.email, user.password)
-      .then( userCredential => {
-        this.newUser = user;
-        console.log(userCredential);
-        userCredential.user.updateProfile( {
-          displayName: user.firstName + ' ' + user.lastName
-        });
-        
-        // Inserts user data in a reltime database.
-        this.insertUserData(userCredential)
-          .then(() => {
-            console.log('User data inserted into databse');
-            this.router.navigate(['/chat']);
-          })
-          .catch(error => {
-              console.log('User data not inserted into database');
-          });
-      })
-      .catch( error => {
-        this.eventAuthError.next(error);
-      });
-    console.log('You are created successfully!');
-  }
-
-  // Interts user data into a firebase realtime database.
-  insertUserData(userCredential: firebase.auth.UserCredential) {
-    return this.db.object('/users/'+userCredential.user.uid).set({
-      email: this.newUser.email,
-      firstname: this.newUser.firstName,
-      lastname: this.newUser.lastName,
-      language: this.newUser.language
-    });
   }
 }

@@ -23,7 +23,7 @@ export class RegisterComponent implements OnInit {
   }
 
   createUser(frm) {
-    this.authService.createUser(frm.value);
+    this.authService.register(frm.value);
   }
 
 }
