@@ -48,6 +48,24 @@
       <version>1.104.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-api-1.0-sdk</artifactId>
+      <version>1.9.59</version>
+    </dependency>
+
+    <dependency>
+     <groupId>commons-io</groupId>
+     <artifactId>commons-io</artifactId>
+     <version>2.6</version>
+    </dependency>
+
+    <dependency>
+     <groupId>com.google.cloud</groupId>
+     <artifactId>google-cloud-translate</artifactId>
+     <version>1.70.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -117,7 +135,7 @@
                         <argument>ng</argument>
                         <argument>build</argument>
                         <argument>--watch</argument>
-                        <argument>--base-href=/capstone_project/ng/</argument>
+                        <argument>--base-href=/</argument>
                     </arguments>
                 </configuration>
                 <goals>
