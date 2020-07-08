@@ -1,3 +1,6 @@
+package com.google.sps.servlets;
+
+
 public class Message {
     String messageId;
     String chatroomId;
