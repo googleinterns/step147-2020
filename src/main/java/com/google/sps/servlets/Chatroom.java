@@ -1,6 +1,7 @@
+package com.google.sps.servlets;
 import java.util.ArrayList;
 
-public class Chatroom{
+public class Chatroom {
     String chatroomId;
     ArrayList<String> users;
 
