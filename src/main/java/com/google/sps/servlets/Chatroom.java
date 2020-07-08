@@ -1,10 +1,12 @@
+import java.util.ArrayList;
+
 public class Chatroom{
     String chatroomId;
-    String[] users;
+    ArrayList<String> users;
 
-    public Chatroom(String newChatroomId, String user1, String User2){
-        this.chatroomId = newChatroomId;
-        this.users.push(user1);
-        this.users.push(user2);
+    public Chatroom(String newChatroomId, String user1, String user2){
+        chatroomId = newChatroomId;
+        users.add(user1);
+        users.add(user2);
     }
 }

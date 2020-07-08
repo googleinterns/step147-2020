@@ -1,14 +1,16 @@
+package com.google.sps.servlets;
+
 public class User {
     String userId;
     String name;
     String email;
     String language;
 
-    public User(String userID, String name, String email, String preferredLanguage) {
+    public User(String userID, String name, String email, String language) {
         this.userId = userID;
         this.name = name;
         this.email = email;
-        this.langauge = preferredLanguage;
+        this.language = language;
     }
 
     public String userID() {
@@ -23,7 +25,7 @@ public class User {
         return email;
     }
 
-    public String preferredLanguage() {
-        return preferredLanguage;
+    public String language() {
+        return language;
     }
 }
