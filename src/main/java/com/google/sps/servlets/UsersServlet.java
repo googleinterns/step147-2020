@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
 import com.google.sps.servlets.User;
 
 /** Servlet that holds the users on this WebApp */
-@WebServlet("/users")
+@WebServlet("/listUsers")
 public class UsersServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
