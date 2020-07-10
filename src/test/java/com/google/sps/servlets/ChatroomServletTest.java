@@ -59,7 +59,6 @@ import com.google.sps.servlets.User;
 @RunWith(JUnit4.class)
 public class ChatroomServletTest {
 
-
     private Entity caller;
     private Entity user1;
     private Entity user2;
@@ -158,12 +157,12 @@ public class ChatroomServletTest {
         helper.tearDown();
     }
 
-    @Test
+    //@Test
     public void testDoGet() throws IOException, ServletException {
 
-        //add random things to database
         DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
         
+        localDatabase.put(caller);
         localDatabase.put(user1);
         localDatabase.put(user2);
 
@@ -217,5 +216,10 @@ public class ChatroomServletTest {
 
         Mockito.verify(printWriter).println(gson.toJson(messagesInChatroom));
         Mockito.verify(response).setContentType("application.json");
+    }
+
+    @Test
+    public void testDoGetEnsureSuccess() throws IOException, ServletException {
+        
     }
 }

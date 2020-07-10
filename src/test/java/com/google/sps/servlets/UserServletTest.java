@@ -14,6 +14,10 @@
 
 package com.google.sps.servlets;
 
+import java.io.ByteArrayInputStream;
+import javax.servlet.ReadListener;
+import java.nio.charset.StandardCharsets;
+import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import com.google.gson.Gson;
@@ -83,7 +87,7 @@ public class UserServletTest {
 
     private Entity user1;
     private Entity user2;
-    private Entity user3;
+    private Entity caller;
 
     private final LocalServiceTestHelper helper =
         new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
@@ -130,7 +134,7 @@ public class UserServletTest {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId").thenReturn((String) caller.getProperty("userId")));
+        Mockito.when(request.getParameter("userId")).thenReturn((String) caller.getProperty("userId"));
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         userServlet.doGet(request, response);
@@ -143,55 +147,10 @@ public class UserServletTest {
         (String) caller.getProperty("language"));
 
         users.add(user);
+
+        Gson gson = new Gson();
+
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(printWriter).println(gson.toJson(users));
     }
-
-    @Test
-    public void testDoPost() throws IOException, ServletException {
-
-        DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
-
-        UserServlet userServlet = new UserServlet();
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-
-        userServlet.doPost(request, response);
-
-        Entity userAdded = new Entity("user");
-        userAdded.setProperty("userId", "41234567890");
-        userAdded.setProperty("name", "new user");
-        userAdded.setProperty("email", "newuser@penpal.app");
-        userAdded.setProperty("language", "en");
-
-        //String input = "{'userId' : '41234567890', 'name' : 'new user', 'email' : 'newuser@penpal.app', 'language' : 'en'}";
-        String input = "{'userId' : '41234567890'}";
-        Reader inputString = new StringReader(input);
-        BufferedReader reader = new BufferedReader(inputString);
-        Mockito.when(request.getReader()).thenReturn(reader);
-
-        assertEquals(localDatabase.prepare(new Query("user")).countEntities(withLimit(10)), 1);
-    }
-
-    // @Test
-    // public void test() throws IOException, ServletException {
-    //     String input = "{'userId' : '41234567890'}";
-    //     Reader inputString = new StringReader(input);
-
-    //     BufferedReader reader = new BufferedReader(inputString);
-
-    //     User userInput = new Gson().fromJson(reader, User.class);
-    //     System.out.println(userInput);
-    //     System.out.println("hello");
-    //     // Mockito.when(request.getReader()).thenReturn(reader);
-
-    //     // DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
-
-    //     // UserServlet userServlet = new UserServlet();
-    //     // HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-    //     // HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-
-    //     // userServlet.doPost(request, response);
-
-    // }
 }
