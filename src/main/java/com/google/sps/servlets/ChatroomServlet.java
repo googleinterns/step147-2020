@@ -55,7 +55,7 @@ public class ChatroomServlet extends HttpServlet {
         for (Entity chatroom : chatrooms.asIterable()) {
             String chatroomId = (String) chatroom.getProperty("chatroomId");
             ArrayList<String> users = (ArrayList<String>) chatroom.getProperty("users");
-
+            
             Chatroom currChatRoom = new Chatroom(chatroomId, users.get(0), users.get(1));
 
             if (currChatRoom.users.contains(userID) && currChatRoom.users.contains(recipientID)) {
@@ -82,7 +82,7 @@ public class ChatroomServlet extends HttpServlet {
 
             Message messageInstance = new Message(messageId, chatroomId, text, translatedText, senderId, recipientId, timestamp);
             
-            if(messageInstance.chatroomId == chatroomID){
+            if (messageInstance.chatroomId.equals(chatroomID)) {
                 messagesInChatroom.add(messageInstance);
             }
         }

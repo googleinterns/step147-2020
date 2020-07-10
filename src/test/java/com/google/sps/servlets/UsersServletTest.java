@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package codeu.controller;
+package com.google.sps.servlets;
 
 import java.io.IOException;
 import java.time.Instant;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.PrintWriter;
 import java.util.UUID;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -27,41 +28,61 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.After;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.gson.Gson;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
+import com.google.sps.servlets.User;
 
+@RunWith(JUnit4.class)
 public class UsersServletTest {
 
-    private User mockUser;
-    private UsersServlet mockServlet;
-    private HttpServletRequest mockRequest;
-    private HttpServletResponse mockResponse;
+    private Entity caller;
+    private Entity user1;
+    private Entity user2;
 
-    // Maximum eventual consistency.
-        private final LocalServiceTestHelper helper =
-        new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig()
-            .setDefaultHighRepJobPolicyUnappliedJobPercentage(100));
+    private final LocalServiceTestHelper helper =
+        new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
     @Before
     public void setUp() {
         helper.setUp();
 
-        Entity caller = new Entity("user");
+        caller = new Entity("user");
         caller.setProperty("userId", "11234567890");
         caller.setProperty("name", "caller");
         caller.setProperty("email", "caller@google.com");
         caller.setProperty("language", "english");
 
-        Entity user1 = new Entity("user");
+        user1 = new Entity("user");
         user1.setProperty("userId", "21234567890");
         user1.setProperty("name", "user1");
         user1.setProperty("email", "user1@google.com");
         user1.setProperty("language", "spanish");
 
-        Entity user2 = new Entity("user");
+        user2 = new Entity("user");
         user2.setProperty("userId", "31234567890");
         user2.setProperty("name", "user2");
         user2.setProperty("email", "user2@google.com");
@@ -86,22 +107,25 @@ public class UsersServletTest {
         UsersServlet usersServlet = new UsersServlet();
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletRequest response = Mockito.mock(HttpServletResponse.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId").thenReturn("11234567890"));
+        Mockito.when(request.getParameter("userId")).thenReturn("11234567890");
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         ArrayList<User> users = new ArrayList<User>();
 
-        User userObject1 = new User(user1.getProperty("userId"), user1.getProperty("name"), user1.getProperty("email"), user1.getProperty("language"));
-        User userObject2 = new User(user2.getProperty("userId"), user2.getProperty("name"), user2.getProperty("email"), user2.getProperty("language"));
+        User userObject1 = new User((String) user1.getProperty("userId"), (String) user1.getProperty("name"), (String) user1.getProperty("email"), (String) user1.getProperty("language"));
+        User userObject2 = new User((String) user2.getProperty("userId"), (String) user2.getProperty("name"), (String) user2.getProperty("email"), (String) user2.getProperty("language"));
 
-        users.addAll(userObject1, userObject2);
+        users.add(userObject1);
+        users.add(userObject2);
 
         Gson gson = new Gson();
 
         usersServlet.doGet(request, response);
 
-        Mockito.verify(response).getWriter().println(gson.toJson(users));
-        Mockito.verify(response).setContentType("application.json")
+        Mockito.verify(printWriter).println(gson.toJson(users));
+        Mockito.verify(response).setContentType("application.json");
     }
 }
