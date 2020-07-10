@@ -6,17 +6,22 @@ import { Message } from '../models/message';
   templateUrl: './chat-section.component.html',
   styleUrls: ['./chat-section.component.css']
 })
+
 export class ChatSectionComponent implements OnInit {
 
-  @Output() emitMessage : EventEmitter<Message> = new EventEmitter();
+  @Output() emitMessage : EventEmitter<String> = new EventEmitter();
   @Input() messages : Message[];
-  @Input() currId : string;
   
+  currId: string;
   newMessage = '';
 
   constructor() { }
 
-  ngOnInit(): void {}
+  ngOnInit(){
+      const localUser = JSON.parse(localStorage.getItem("user"));
+      this.currId = localUser.uid;
+      console.log("Chat section uid: ", this.currId);
+  }
 
   sendMessage(){
 
@@ -24,14 +29,8 @@ export class ChatSectionComponent implements OnInit {
         return;
     }
 
-    const sendMessage : Message = {
-        chatroom_id : this.messages[0].chatroom_id,
-        text: this.newMessage,
-        sender_id : this.currId
-    };
-
-    this.emitMessage.emit(sendMessage);
+    this.emitMessage.emit(this.newMessage);
     this.newMessage = '';
-  };
+  }
 
 }

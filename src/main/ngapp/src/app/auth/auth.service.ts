@@ -7,6 +7,8 @@ import { User } from 'firebase';
 import { ThrowStmt } from '@angular/compiler';
 import { BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { User as LocalUser } from '../models/user';
 
 
 @Injectable({
@@ -17,18 +19,17 @@ export class AuthService {
   private eventAuthError = new BehaviorSubject<string>("");
   eventAuthError$ = this.eventAuthError.asObservable();
   newUser: any;
-
   user: User;
 
-  constructor(public afAuth: AngularFireAuth, public router: Router) {
-    this.afAuth.authState.subscribe((user) => {
-      if (user) {
-        this.user = user;
-        localStorage.setItem('user', JSON.stringify(this.user));
-      } else {
-        localStorage.setItem('user', null);
-      }
-    });
+  constructor(public afAuth: AngularFireAuth, private router: Router, private http: HttpClient) {
+    // this.afAuth.authState.subscribe((user) => {
+    //   if (user) {
+    //     this.user = user;
+    //     localStorage.setItem('user', JSON.stringify(this.user));
+    //   } else {
+    //     localStorage.setItem('user', null);
+    //   }
+    // });
   }
 
   // Login function.
@@ -36,6 +37,8 @@ export class AuthService {
     this.afAuth
       .signInWithEmailAndPassword(email, password)
       .then((res: any) => {
+        console.log("Logging in", res.user);
+        localStorage.setItem('user', JSON.stringify(res.user));
         this.router.navigate(['/chat']);
       })
       .catch((error: any) => {
@@ -44,12 +47,25 @@ export class AuthService {
   }
 
   // Registration function.
-  register(user) {
+register(user) {
+    var uid : string;
     this.afAuth
       .createUserWithEmailAndPassword(user.email, user.password)
       .then((res) => {
-        this.sendEmailVerification();
-        console.log('You are Successfully registered!', res);
+        localStorage.setItem('user', JSON.stringify(res.user));
+        console.log('You are Successfully registered!', res.user);
+        const userInstance : LocalUser = {
+                userId : res.user.uid,
+                name : user.firstName + " " + user.lastName,
+                email: user.email,
+                language: user.language
+        };
+        const promise = this.http.post<LocalUser>("/user", userInstance).toPromise();
+        promise.then(response => {
+            console.log("User post request: ", response);
+            this.router.navigate(['/chat']);
+        });
+        
       })
       .catch((error: any) => console.log('Something is wrong:', error.message ));
   }
@@ -77,6 +93,7 @@ export class AuthService {
       .signOut()
       .then((res) => {
         localStorage.removeItem('user');
+        this.router.navigate(['/']);
         console.log('successfully logged out');
       })
       .catch((err) => console.error(err));
