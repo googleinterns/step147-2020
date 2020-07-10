@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
-//import * as auth0 from 'auth0-js';
-
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -10,11 +7,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-
   authError: any;
 
-
-  constructor(public authService: AuthService, private router: Router) { }
+  constructor(public authService: AuthService) { }
 
   ngOnInit() {
     this.authService.eventAuthError$.subscribe( data => {
@@ -22,7 +17,8 @@ export class RegisterComponent implements OnInit {
     })
   }
 
-  createUser(frm) {
+  createUser(frm): void {
+    console.log("Create user called!")
     this.authService.register(frm.value);
   }
 
