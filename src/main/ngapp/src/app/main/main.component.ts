@@ -15,6 +15,7 @@ export class MainComponent implements OnInit {
   currentRecipient: string;
   messages: Message[];
   currId: string;
+  chatroom: string;
 
   constructor(private chatService: ChatDataService) {}
 
@@ -32,12 +33,22 @@ export class MainComponent implements OnInit {
 
   onChange(recipientId: string) {
     this.currentRecipient = recipientId;
-    this.chatService
-      .getMessages(recipientId)
-      .subscribe((messages: Message[]) => this.messages = messages);
+    const promise = this.chatService.getMessages(recipientId).toPromise();
+    promise.then(messages => {
+        this.chatroom = this.chatService.getChatroom(recipientId);
+        this.messages = messages;
+        console.log(messages);
+        console.log("Main chatroom id: ", this.chatroom);
+        this.chatService.channel.bind('new-message', data => {
+            console.log("Pusher data", data);
+            this.messages.push(JSON.parse(data));
+        });
+    });
+    
   }
 
   onNewMessage(newMessage: string) {
+    console.log("New Message sent", newMessage);
     let newPost : Post = {
         senderId: this.currId,
         recipientId: this.currentRecipient,

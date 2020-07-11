@@ -22,7 +22,7 @@
             ></app-chat-bar>
           </div>
         </div>
-        <div>
+        <div *ngIf="messages">
             <app-chat-section 
             class="mesgs"
             [messages]="messages"

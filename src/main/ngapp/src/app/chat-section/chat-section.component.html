@@ -30,9 +30,9 @@
     </li>
 </div>
 <div class="chat_input">
-    <form class = "flex" (submit)="sendMessage()">
+    <form class = "flex" (click)="sendMessage()">
         <input class="form-control input" type="text" placeholder="Type a mesage" name="newMessage" [(ngModel)]="newMessage">
-        <button type="submit" class="btn btn-primary mb-2 send_btn">Send</button>
+        <button type="submit" class="btn btn-primary mb-2 send_btn" (click)="sendMessage()">Send</button>
     </form>
 </div>
 
