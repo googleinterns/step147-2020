@@ -24,11 +24,10 @@ export class ChatSectionComponent implements OnInit {
   }
 
   sendMessage(){
-
     if(this.newMessage.trim() === ''){
         return;
     }
-
+    console.log(this.newMessage);
     this.emitMessage.emit(this.newMessage);
     this.newMessage = '';
   }
