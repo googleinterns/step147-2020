@@ -12,20 +12,4 @@ public class User {
         this.email = email;
         this.language = language;
     }
-
-    public String userID() {
-        return userId;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public String email() {
-        return email;
-    }
-
-    public String language() {
-        return language;
-    }
 }

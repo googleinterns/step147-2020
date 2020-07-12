@@ -1,44 +1,50 @@
 import { Injectable } from '@angular/core';
 import { Message } from './models/message';
-import { MESSAGES } from './mocks/mock-messages';
 import { Chatroom } from './models/chatroom';
-import { CHATROOMS } from './mocks/mock-chatroom';
 import { User } from './models/user';
-import { USERS } from './mocks/mock-users';
-import { Observable, of } from 'rxjs';
-
+import { Post } from './models/post';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
+ 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatDataService {
-  currentChatRoom: string = '';
-  currId: string = 'e3d39673-e3eb-4002-8374-baff95ccd118';
-  constructor() {}
-
-  getUsers(): User[] {
-    return USERS;
+ 
+  constructor(private authService: AuthService, private http: HttpClient ) {
   }
 
-  getChatrooms(): Chatroom[] {
-    return CHATROOMS;
+  // Get the object associated with the currrent user.
+  getUser(): Observable<User[]> {
+    var localUser = JSON.parse(localStorage.getItem("user"));
+    console.log("UserId: ", localUser.uid);
+    console.log("Found local user in storage: ", localUser.uid);
+    return this.http.get<User[]>("/user?userId="+localUser.uid);
   }
 
-  getMessages(): Message[] {
-    return MESSAGES;
+  // Create a new user object for the user.
+  addUser(user: User): void{
+      this.http.post("/user", user);
   }
 
-  addMessage(input: Message): void {
-    MESSAGES.push(input);
+  getUsers(): Observable<User[]> {
+    var localUser = JSON.parse(localStorage.getItem("user"));
+    return this.http.get<User[]>("/users?userId="+localUser.uid);
   }
 
-  changeChat(id) {
-    const gotId = CHATROOMS.filter((chatroom) => {
-      if (chatroom.users.includes(this.currId) && chatroom.users.includes(id)) {
-        return chatroom;
-      }
-    });
-
-    this.currentChatRoom = gotId[0].chatroom_id;
-    console.log(this.currentChatRoom);
+  getMessages(recipient: string): Observable<Message[]> {
+    var localUser = JSON.parse(localStorage.getItem("user"));
+    let url: string = "/chatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
+    return this.http.get<Message[]>(url);
+  }
+ 
+  addMessage(input: Post): void {
+    this.http.post("/chatroom", JSON.stringify(input));
+  }
+ 
+  logout(){
+    this.authService.logout();
   }
 }

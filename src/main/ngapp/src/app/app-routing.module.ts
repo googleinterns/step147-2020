@@ -11,15 +11,17 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard]
   },
   {
     path: 'register',
     component: RegisterComponent,
+    pathMatch: 'full'
   },
   {
     path: 'chat',
     component: MainComponent,
+    pathMatch: 'full'
   },
 ];
 

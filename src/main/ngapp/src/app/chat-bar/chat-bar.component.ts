@@ -12,14 +12,19 @@ export class ChatBarComponent implements OnInit {
   @Output() changeChat: EventEmitter<any> = new EventEmitter();
 
   @Input() users: User[];
-  @Input() currId: string;
+  currId: string;
 
   constructor() { }
 
   ngOnInit(): void {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    this.currId = localUser.uid;
+    console.log("In chat bar, users: ", this.users);
+    console.log("In chat bar, userId: ", this.currId);
   }
 
-  onSelect(id){
+  onSelect(id: string){
+      console.log("Emit id: ", id);
       this.changeChat.emit(id);
   }
 

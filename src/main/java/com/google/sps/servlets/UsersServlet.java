@@ -50,7 +50,7 @@ public class UsersServlet extends HttpServlet {
 
            User userInstance = new User(userId, name, email, language);
 
-           if(userInstance.userId != userID){
+           if(userId != userID){
                users.add(userInstance);
            }
         }
