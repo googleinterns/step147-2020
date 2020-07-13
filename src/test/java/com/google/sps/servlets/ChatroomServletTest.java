@@ -98,17 +98,13 @@ public class ChatroomServletTest {
 
         chatroom1 = new Entity("chatroom");
         chatroom1.setProperty("chatroomId", "1");
-        ArrayList<String> chatroom1users = new ArrayList<String>();
-        chatroom1users.add((String) user1.getProperty("userId"));
-        chatroom1users.add((String) user2.getProperty("userId"));
-        chatroom1.setProperty("users", chatroom1users);
+        chatroom1.setProperty("user1", (String) user1.getProperty("userId"));
+        chatroom1.setProperty("user2", (String) user2.getProperty("userId"));
 
         chatroom2 = new Entity("chatroom");
         chatroom2.setProperty("chatroomId", "2");
-        ArrayList<String> chatroom2users = new ArrayList<String>();
-        chatroom2users.add((String) caller.getProperty("userId"));
-        chatroom2users.add((String) user2.getProperty("userId"));
-        chatroom2.setProperty("users", chatroom2users);
+        chatroom2.setProperty("user1", (String) caller.getProperty("userId"));
+        chatroom2.setProperty("user2", (String) user2.getProperty("userId"));
 
         message1 = new Entity("message");
         message1.setProperty("messageId", "1");
@@ -157,7 +153,7 @@ public class ChatroomServletTest {
         helper.tearDown();
     }
 
-    //@Test
+    @Test
     public void testDoGet() throws IOException, ServletException {
 
         DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
@@ -215,11 +211,6 @@ public class ChatroomServletTest {
         
 
         Mockito.verify(printWriter).println(gson.toJson(messagesInChatroom));
-        Mockito.verify(response).setContentType("application.json");
-    }
-
-    @Test
-    public void testDoGetEnsureSuccess() throws IOException, ServletException {
-        
+        Mockito.verify(response).setContentType("application/json");
     }
 }
