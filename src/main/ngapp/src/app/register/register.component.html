@@ -1,6 +1,9 @@
-<div class="row mt-4">
+<div class="alignment">
+<div class="row mt-4" >
+
   <div class="col-12">
     <h4>Registration</h4>
+    <br>
   </div>
 
   <div class="col-12">
@@ -30,6 +33,10 @@
                 <option value="fr">French</option>
                 <option value="sp">Spanish</option>
                 <option value="it">Italian</option>
+                <option value=sw> Swahili </option>
+                <option value="zh">Chinese</option>
+                <option value="ar">Arabic </option>
+                <option value="de">German </option>
             </select>
           </div>
       </div>
@@ -43,18 +50,37 @@
 
       <div>
         <div class="row">
-          <div class="col-md-12 mb-2" class="col-sm-4 col-xs-4">
+          <div class="col-md-10 mb-2" >
             <label for="password">Password</label>
             <input ngModel #password="ngModel" name="password" type="password" class="form-control">
           </div>
         </div>
+      </div>
+      <div>
+        <div class="row">
+          <div class="col-md-10 mb-2">
+            <label for="confirmPassword">Confirm Password</label>
+            <input required ngModel #confirmPassword="ngModel" name="confirmPassword" id="confirmPassword"
+            type="password" class="form-control" appConfirmEqualValidator="password" >
+            <span class="help-block"
+                *ngIf="confirmPassword.touched && confirmPassword.errors?.notEqual && 
+                !confirmPassword.errors?.required">
+                Password Mismatch!
+            </span>
+          </div>
+        </div>
         <div class="row">
           <div class="col-md-12">
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary" type="submit" [disabled]="!userRegForm.valid">Submit</button>
+            <span class="help-block"
+                *ngIf="!userRegForm.valid">
+                Please Fill Out All the Fields
+            </span>
           </div>
         </div>
       </div>
 
     </form>
   </div>
+</div> 
 </div>
