@@ -102,9 +102,13 @@ public class UserServletTest {
         helper.tearDown();
     }
 
+    /**
+    * Tests how the servlet fetches a specific user from the datastore.
+    */
     @Test
     public void testDoGet() throws IOException, ServletException {
 
+        // add random users to the database
         DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
 
         caller = new Entity("user");
@@ -130,6 +134,8 @@ public class UserServletTest {
         localDatabase.put(user2);
 
         UserServlet userServlet = new UserServlet();
+
+        // mock objects for the execution of the test
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
@@ -150,6 +156,7 @@ public class UserServletTest {
 
         Gson gson = new Gson();
 
+        // ensures that the request writes the correct user as a response
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(printWriter).println(gson.toJson(users));
     }

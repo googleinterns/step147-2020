@@ -94,10 +94,15 @@ public class UsersServletTest {
         helper.tearDown();
     }
 
+    /**
+    * Tests how the servlet returns all of the users in the datastore.
+    * Request should return all of the users in the datastore excluding
+    * the user who is currently logged in.
+    */
     @Test
     public void testDoGet() throws IOException, ServletException {
 
-        //add random things to database
+        // add random users to the database
         DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
         
         localDatabase.put(caller);
@@ -106,6 +111,7 @@ public class UsersServletTest {
 
         UsersServlet usersServlet = new UsersServlet();
 
+        // mock objects for the execution of the test
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
@@ -125,6 +131,7 @@ public class UsersServletTest {
 
         usersServlet.doGet(request, response);
 
+        // ensures that the request writes the correct users as a response
         Mockito.verify(printWriter).println(gson.toJson(users));
         Mockito.verify(response).setContentType("application.json");
     }
