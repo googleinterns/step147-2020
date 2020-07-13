@@ -14,64 +14,74 @@
 
 package com.google.sps.servlets;
 
-import java.io.IOException;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.TranslateOptions;
+import com.google.cloud.translate.Translation;
 import com.google.gson.Gson;
-import java.util.HashMap;
-import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import com.google.datastore.v1.PropertyFilter;
+import org.apache.commons.io.IOUtils;
 import com.google.sps.servlets.Message;
-
-FirebaseApp.initializeApp();
+import com.google.sps.servlets.Post;
+import com.google.sps.servlets.Chatroom;
+import com.pusher.rest.Pusher;
 
 /** Servlet that holds the chatrooms active on this WebApp */
 @WebServlet("/chatroom")
 public class ChatroomServlet extends HttpServlet {
 
-    private DatastoreService database = DatastoreServiceFactory.getDatastoreService();
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // check header and verifies if user is legit using Firebase
-        String userID;
-        try {
-            String authenticationToken = request.getHeader("auth-token");  
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            userID = decodedToken.getUid();
-        } catch (FirebaseAuthException e) {
-            System.out.println("Failure");
-            return;
-        }
 
+        String userID = request.getParameter("userId");
         String recipientID = request.getParameter("recipientId"); // the user whose chat was clicked
-        String chatroomID;
+        String chatroomID = "null";
 
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Query chatroomQuery = new Query("chatroom");
-        PreparedQuery chatrooms = database.prepare(chatroomQuery);
+        PreparedQuery chatrooms = datastore.prepare(chatroomQuery);
 
         for (Entity chatroom : chatrooms.asIterable()) {
-            if (chatroom.getProperty("users").contains(userID) && chatroom.getProperty("users").contains(recipientID)) {
-                    chatroomID = chatroom.get("chatroomId");
+            String chatroomId = (String) chatroom.getProperty("chatroomId");
+            String user1 = (String) chatroom.getProperty("user1");
+            String user2 = (String) chatroom.getProperty("user2");
+
+            Chatroom currChatRoom = new Chatroom(chatroomId, user1, user2);
+            List<String> usersList = currChatRoom.getUsers();
+
+            if ((usersList.contains(userID)) && (usersList.contains(recipientID))) {
+                    chatroomID = currChatRoom.getId();
                     break;
             }
         }
 
+        // Check to see if chatroom is empty and make new chatroom
+        if (chatroomID == "null") {
+            Entity newChatroom = new Entity("chatroom");
+            chatroomID = UUID.randomUUID().toString();
+            newChatroom.setProperty("chatroomId", chatroomID);
+            newChatroom.setProperty("user1", userID);
+            newChatroom.setProperty("user2", recipientID);
+            datastore.put(newChatroom);
+        }
+
         // go through messages and grabs the messages with chatroomID = to the chatroomID passed in
         // then sorts them by timestamp
-        Query messageQuery = new Query("message").addSort("timestamp", SortDirection.DESCENDING);
+        Query messageQuery = new Query("message").addSort("timestamp", SortDirection.ASCENDING);
+        PreparedQuery results = datastore.prepare(messageQuery);
 
-        PreparedQuery results = database.prepare(query);
         ArrayList<Message> messagesInChatroom = new ArrayList<Message>();
 
         for (Entity message : results.asIterable()) {
@@ -84,68 +94,90 @@ public class ChatroomServlet extends HttpServlet {
             Long timestamp = (Long) message.getProperty("timestamp");
 
             Message messageInstance = new Message(messageId, chatroomId, text, translatedText, senderId, recipientId, timestamp);
-
-            messagesInChatroom.add(messageInstance);
+            System.out.println(chatroomId);
+            System.out.println(chatroomID);
+            if(chatroomId.equals(chatroomID)){
+                messagesInChatroom.add(messageInstance);
+                System.out.println(messagesInChatroom);
+            }
         }
 
+        Gson gson = new Gson();
+    
+        response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println(convertToJsonUsingGson(messagesInChatroom));
+        response.getWriter().println(gson.toJson(messagesInChatroom));
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String userID;
         
-        try {
-            String authenticationToken = request.getHeader("auth-token");  
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(authenticationToken);
-            userID = decodedToken.getUid();
-        } catch (FirebaseAuthException e) {
-            System.out.println("Failure");
-            return;
-        }
+        String jsonString = IOUtils.toString(request.getInputStream());
+        Post newPost = new Gson().fromJson(jsonString, Post.class);
+        
+        System.out.println(newPost);
 
-        String recipientID = request.getParameter("recipientId");
-        String chatroomID;
-
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        String chatroomID = "";
         Query chatroomQuery = new Query("chatroom");
-        PreparedQuery chatrooms = database.prepare(query);
+        PreparedQuery chatrooms = datastore.prepare(chatroomQuery);
 
+        // Query and retrieve the chatroom for the users.
         for (Entity chatroom : chatrooms.asIterable()) {
-            if (chatroom.getProperty("users").contains(userID) && chatroom.getProperty("users").contains(recipientID)) {
-                    chatroomID = chatroom.get("chatroomId");
+            String chatroomId = (String) chatroom.getProperty("chatroomId");
+            String user1 = (String) chatroom.getProperty("user1");
+            String user2 = (String) chatroom.getProperty("user2");
+
+            Chatroom currChatRoom = new Chatroom(chatroomId, user1, user2);
+            List<String> usersList = currChatRoom.getUsers();
+
+            if (usersList.contains(newPost.senderId) && usersList.contains(newPost.recipientId)) {
+                    chatroomID = currChatRoom.getId();
                     break;
             }
         }
 
-        if (chatroomID == null) { //make new chatroom
-            Entity newChatroom = new Entity("chatroom");
-            String[] chatroomMembers = {userID, recipientID};
-            newChatroom.setProperty("chatroomId", database.allocateId(newChatroom));
-            newChatroom.setProperty("users", chatroomMembers);
-            chatroomID = newChatroom.getProperty("chatroomId");
+        // Query the user and retrieve the language of the recipient.
+        Query userQuery = new Query("user");
+        PreparedQuery users = datastore.prepare(userQuery);
+        String lang = "";
+        for (Entity user: users.asIterable()){
+            System.out.println("Getting language");
+            String userLang = (String) user.getProperty("userId");
+            if( userLang.equals(newPost.recipientId)){
+                lang = (String) user.getProperty("language");
+                break;
+            }
         }
 
-        Entity newMessage = new Entity("message");
-        newMessage.setProperty("messageId", database.allocateId(newMessage));
-        newMessage.setProperty("chatroomId", chatroomID);
-        newMessage.setProperty("text", request.getParameter("text"));
-        newMessage.setProperty("senderId", userID);
-        newMessage.setProperty("recipientId", recipientID);
-        newMessage.setProperty("timestamp", System.currentTimeMillis());
-
-        //translation
+        // Translate the text.
         Translate translate = TranslateOptions.getDefaultInstance().getService();
-        Translation translation = translate.translate((String) newMessage.getProperty("text"), Translate.TranslateOption.targetLanguage(request.getParameter("translation-language")));
+        Translation translation = translate.translate(newPost.text, Translate.TranslateOption.targetLanguage(lang));
         String translatedText = translation.getTranslatedText();
+
+        Entity newMessage = new Entity("message");
+        String messageUUID = UUID.randomUUID().toString();
+        newMessage.setProperty("messageId", messageUUID);
+        newMessage.setProperty("chatroomId", chatroomID);
+        newMessage.setProperty("text", newPost.text);
         newMessage.setProperty("translatedText", translatedText);
+        newMessage.setProperty("senderId", newPost.senderId);
+        newMessage.setProperty("recipientId", newPost.recipientId);
+        newMessage.setProperty("timestamp", System.currentTimeMillis());
+        datastore.put(newMessage);
 
-        database.put(newMessage);
-    }
+        //Push the message
+        Pusher pusher = new Pusher("1036570", "fb37d27cdd9c1d5efb8d", "9698b690db9bed0b0ef7");
+        pusher.setCluster("us2");
+        pusher.setEncrypted(true);
 
-    private String convertToJsonUsingGson(Object list) {
+        // New message instance
+        Message messageInstance = new Message(messageUUID, chatroomID, newPost.text, translatedText, newPost.senderId, newPost.recipientId, System.currentTimeMillis());
         Gson gson = new Gson();
-        String json = gson.toJson(list);
-        return json;
+
+        System.out.println("Pusher triggered");
+        pusher.trigger(chatroomID, "new-message", gson.toJson(messageInstance));
+
     }
+
 }

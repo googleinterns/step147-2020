@@ -3,8 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
-};
+      production: false,
+      pusher: {
+        key: 'fb37d27cdd9c1d5efb8d',
+        cluster: 'us2',
+      }
+    };
 
 /*
  * For easier debugging in development mode, you can import the following file

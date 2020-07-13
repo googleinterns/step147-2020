@@ -1,4 +1,4 @@
 export interface Chatroom{
-    chatroom_id: string;
+    chatroomId: string;
     users : string[];
 }
