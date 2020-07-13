@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import javax.servlet.ServletInputStream;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -46,7 +47,8 @@ public class UserServlet extends HttpServlet {
         ArrayList<User> users = new ArrayList<User>();
 
         for (Entity user : results.asIterable()) {
-            if((String) user.getProperty("userId") == userID){
+            String currUserId = (String) user.getProperty("userId");
+            if (currUserId.equals(userID)){
                 String userId = (String) user.getProperty("userId");
                 String name = (String) user.getProperty("name");
                 String email = (String) user.getProperty("email");
@@ -65,15 +67,16 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String jsonString = IOUtils.toString(request.getInputStream());
+        String jsonString = IOUtils.toString((request.getInputStream()));
         User userInput = new Gson().fromJson(jsonString, User.class);
-
+        
         Entity newUser = new Entity("user");
         newUser.setProperty("userId", userInput.userId);
         newUser.setProperty("name", userInput.name);
         newUser.setProperty("email", userInput.email);
         newUser.setProperty("language", userInput.language);
 
+        //System.out.println(IOUtils.toString(request.getInputStream()));
         database.put(newUser);
     }
 }

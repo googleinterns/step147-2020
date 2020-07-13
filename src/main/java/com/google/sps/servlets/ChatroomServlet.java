@@ -94,9 +94,8 @@ public class ChatroomServlet extends HttpServlet {
             Long timestamp = (Long) message.getProperty("timestamp");
 
             Message messageInstance = new Message(messageId, chatroomId, text, translatedText, senderId, recipientId, timestamp);
-            System.out.println(chatroomId);
-            System.out.println(chatroomID);
-            if(chatroomId.equals(chatroomID)){
+          
+            if (chatroomId.equals(chatroomID)){
                 messagesInChatroom.add(messageInstance);
                 System.out.println(messagesInChatroom);
             }
@@ -144,7 +143,7 @@ public class ChatroomServlet extends HttpServlet {
         for (Entity user: users.asIterable()){
             System.out.println("Getting language");
             String userLang = (String) user.getProperty("userId");
-            if( userLang.equals(newPost.recipientId)){
+            if (userLang.equals(newPost.recipientId)){
                 lang = (String) user.getProperty("language");
                 break;
             }
