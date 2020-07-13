@@ -43,6 +43,7 @@ export class AuthService {
       })
       .catch((error: any) => {
         console.log('Something is wrong:', error.message);
+        window.alert(error.message);
       });
   }
 
