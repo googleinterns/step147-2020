@@ -15,20 +15,20 @@
             />
           </div>
 
-          <div class="inbox_chat">
+          <div class="inbox_chat" *ngIf="users">
             <app-chat-bar
               [users]="users"
-              [currId]="currId"
               (changeChat)="onChange($event)"
             ></app-chat-bar>
           </div>
         </div>
-        <app-chat-section
-          class="mesgs"
-          [messages]="messages"
-          [currId]="currId"
-          (emitMessage)="onNewMessage($event)"
-        ></app-chat-section>
+        <div *ngIf="messages">
+            <app-chat-section 
+            class="mesgs"
+            [messages]="messages"
+            (emitMessage)="onNewMessage($event)"
+            ></app-chat-section>
+        </div>
       </div>
     </div>
   </div>

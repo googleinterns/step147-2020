@@ -1,21 +1,10 @@
 @import "~bootstrap/dist/css/bootstrap.min.css";
-.col-12 {
-    margin-left: 50px;
-    position: relative;
+.alignment {
+    margin: 0 auto;
+    text-align: left;
+    width: 800px;
+    padding-top: 80px;
 }
 .row {
     max-width: 600px;
 }
-
-/* .card {
-    font-family: 'Times New Roman';
-    flex-direction: column;
-    margin: 80px;
-    box-shadow: 0  10px  20px  rgba(0,0,0,0.19), 0  6px  6px  rgba(0,0,0,0.23);
-    max-width: 1200px;
-}
-
-.container {
-    flex-direction: column;
-    padding-top: 80px;
-} */

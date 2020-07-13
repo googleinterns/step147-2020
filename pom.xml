@@ -65,6 +65,13 @@
      <artifactId>google-cloud-translate</artifactId>
      <version>1.70.0</version>
     </dependency>
+    
+    <dependency>
+      <groupId>com.pusher</groupId>
+      <artifactId>pusher-http-java</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    
 
     <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
     <dependency>
@@ -119,7 +126,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>YOUR_PROJECT_ID_HERE</deploy.projectId>
+          <deploy.projectId>team147-step2020</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>

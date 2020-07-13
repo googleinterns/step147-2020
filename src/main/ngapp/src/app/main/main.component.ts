@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ChatDataService } from '../chat-data.service';
 import { User } from '../models/user';
 import { Message } from '../models/message';
+import { Post } from '../models/post';
 import { Chatroom } from '../models/chatroom';
-import { AuthService } from '../auth/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -13,45 +12,52 @@ import { Router } from '@angular/router';
 })
 export class MainComponent implements OnInit {
   users: User[];
+  currentRecipient: string;
   messages: Message[];
-  currId = 'e3d39673-e3eb-4002-8374-baff95ccd118';
+  currId: string;
+  chatroom: string;
 
-  constructor(
-    private chatService: ChatDataService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private chatService: ChatDataService) {}
 
   ngOnInit(): void {
-    this.users = this.chatService
-      .getUsers()
-      .filter((user) => user.user_id !== this.currId);
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    this.currId = localUser.uid;
+
+    const promise = this.chatService.getUsers().toPromise();
+    promise.then(users => {
+        this.users = users;
+        console.log("Users", this.users);
+    });
+
   }
 
-  onChange(e: string) {
-    const chatroomArray: Chatroom[] = this.chatService
-      .getChatrooms()
-      .filter((chatroom) => {
-        if (
-          chatroom.users.includes(e) &&
-          chatroom.users.includes(this.currId)
-        ) {
-          return chatroom;
-        }
-      });
-    let chat_id = chatroomArray[0].chatroom_id;
-
-    this.messages = this.chatService
-      .getMessages()
-      .filter((message) => message.chatroom_id === chat_id);
+  onChange(recipientId: string) {
+    this.currentRecipient = recipientId;
+    const promise = this.chatService.getMessages(recipientId).toPromise();
+    promise.then(messages => {
+        this.chatroom = this.chatService.getChatroom(recipientId);
+        this.messages = messages;
+        console.log(messages);
+        console.log("Main chatroom id: ", this.chatroom);
+        this.chatService.channel.bind('new-message', data => {
+            console.log("Pusher data", data);
+            this.messages.push(JSON.parse(data));
+        });
+    });
+    
   }
 
-  onNewMessage(e: Message) {
-    this.messages.push(e);
-    this.chatService.addMessage(e);
+  onNewMessage(newMessage: string) {
+    console.log("New Message sent", newMessage);
+    let newPost : Post = {
+        senderId: this.currId,
+        recipientId: this.currentRecipient,
+        text: newMessage
+    }
+    this.chatService.addMessage(newPost);
   }
 
   logout(): void {
-    this.authService.logout();
+    this.chatService.logout();
   }
 }
