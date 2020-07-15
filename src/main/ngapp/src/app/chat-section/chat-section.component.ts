@@ -18,16 +18,16 @@ export class ChatSectionComponent implements OnInit {
   constructor() { }
 
   ngOnInit(){
-      const localUser = JSON.parse(localStorage.getItem("user"));
-      this.currId = localUser.uid;
-      console.log("Chat section uid: ", this.currId);
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    this.currId = localUser.uid;
   }
 
   sendMessage(){
+
     if(this.newMessage.trim() === ''){
         return;
     }
-    console.log(this.newMessage);
+ 
     this.emitMessage.emit(this.newMessage);
     this.newMessage = '';
   }

@@ -26,7 +26,6 @@ export class MainComponent implements OnInit {
     const promise = this.chatService.getUsers().toPromise();
     promise.then(users => {
         this.users = users;
-        console.log("Users", this.users);
     });
 
   }
@@ -34,22 +33,21 @@ export class MainComponent implements OnInit {
   onChange(recipientId: string) {
     this.currentRecipient = recipientId;
     const promise = this.chatService.getMessages(recipientId).toPromise();
+
     promise.then(messages => {
-        this.chatroom = this.chatService.getChatroom(recipientId);
         this.messages = messages;
-        console.log(messages);
-        console.log("Main chatroom id: ", this.chatroom);
+        this.chatroom = this.chatService.getChatroom(recipientId);
+
         this.chatService.channel.bind('new-message', data => {
-            console.log("Pusher data", data);
             this.messages.push(JSON.parse(data));
         });
+
     });
     
   }
 
   onNewMessage(newMessage: string) {
-    console.log("New Message sent", newMessage);
-    let newPost : Post = {
+    const newPost : Post = {
         senderId: this.currId,
         recipientId: this.currentRecipient,
         text: newMessage
