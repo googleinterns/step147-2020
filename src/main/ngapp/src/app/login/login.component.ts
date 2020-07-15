@@ -10,9 +10,7 @@ import { Router } from '@angular/router';
 export class LoginComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {
-    console.log("Login initialized");
-  }
+  ngOnInit(): void {}
 
   login(email: string, password: string): void {
     this.authService.login(email, password);
