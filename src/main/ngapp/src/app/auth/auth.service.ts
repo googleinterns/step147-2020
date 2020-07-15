@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import * as firebase from 'firebase/app';
 import { auth } from 'firebase/app';
@@ -18,8 +18,11 @@ export class AuthService {
 
   private eventAuthError = new BehaviorSubject<string>("");
   eventAuthError$ = this.eventAuthError.asObservable();
+  userSample: LocalUser;
+  private userDataSource = new BehaviorSubject<LocalUser>(this.userSample);
+  $userSource = this.userDataSource.asObservable();
   newUser: any;
-  user: User;
+  userInstance2: LocalUser;
 
   constructor(public afAuth: AngularFireAuth, private router: Router, private http: HttpClient) {
     // this.afAuth.authState.subscribe((user) => {
@@ -48,7 +51,7 @@ export class AuthService {
   }
 
   // Registration function.
-register(user) {
+  register(user) {
     var uid : string;
     this.afAuth
       .createUserWithEmailAndPassword(user.email, user.password)
@@ -105,5 +108,51 @@ register(user) {
     const user = JSON.parse(localStorage.getItem('user'));
     console.log('checking if user is logged in');
     return user !== null;
+  }
+
+  // Login with Facebook.
+  twitterAuth() {
+    return this.authLogin(new auth.TwitterAuthProvider());
+  } 
+
+
+  // Login with Facebook.
+  facebookAuth() {
+    return this.authLogin(new auth.FacebookAuthProvider());
+  }  
+
+  // Login with Google.
+  googleAuth() {
+    return this.authLogin(new auth.GoogleAuthProvider());
+  }
+  
+  // AuthLogin for other various auth providers eg Facebook, Google.
+  authLogin(provider) {
+    provider.setCustomParameters({
+        'display': 'popup'
+    });
+    return this.afAuth.signInWithPopup(provider)
+    .then((result) => {
+      
+      // Set user data if it is the first time the user is loggin in.
+      if(result.additionalUserInfo.isNewUser) {
+        this.userInstance2 = {
+          userId : result.user.uid,
+          name : "",
+          email: result.user.email,
+          language: ""
+        };
+        this.userDataSource.next(this.userInstance2);
+        console.log('userDataSource',this.$userSource);
+        this.router.navigate(['/select-language'])
+      }
+      // If not first time logging in, route to chat page.
+      else {
+        this.router.navigate(['/chat']);
+      }
+
+    }).catch((error) => {
+      window.alert(error)
+    })
   }
 }
