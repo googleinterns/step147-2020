@@ -18,7 +18,6 @@ export class RegisterComponent implements OnInit {
   }
 
   createUser(frm): void {
-    console.log("Create user called!")
     this.authService.register(frm.value);
   }
 
