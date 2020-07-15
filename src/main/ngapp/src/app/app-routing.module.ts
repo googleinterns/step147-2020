@@ -5,6 +5,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MainComponent } from './main/main.component';
+import { SelectLanguageComponent } from './select-language/select-language.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -23,6 +24,11 @@ const routes: Routes = [
     component: MainComponent,
     pathMatch: 'full'
   },
+  {
+    path: 'select-language',
+    component: SelectLanguageComponent,
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({

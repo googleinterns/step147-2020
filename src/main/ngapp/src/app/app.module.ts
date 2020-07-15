@@ -16,6 +16,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MainComponent } from './main/main.component';
 import { ConfirmEqualValidatorDirective } from './auth/confirm-equal-validator.directive';
+import { SelectLanguageComponent } from './select-language/select-language.component';
 
 // My web app's Firebase configuration.
 const firebaseConfig = {
@@ -37,7 +38,8 @@ const firebaseConfig = {
     LoginComponent,
     RegisterComponent,
     MainComponent,
-    ConfirmEqualValidatorDirective
+    ConfirmEqualValidatorDirective,
+    SelectLanguageComponent
   ],
   imports: [
     BrowserModule,

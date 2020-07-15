@@ -35,19 +35,37 @@
                 >
                   Login
                 </button>
-                <button
-                  type="button"
-                  class="btn btn-block"
-                  type="submit"
-                  (click)="sendPasswordResetEmail(userEmail.value)"
-                >
-                  Reset Password
+
+                <p>
+                    Don't have an account?
+                    <a [routerLink]="['/register']"> Sign up here </a>
+                </p>
+    
+                <p>
+                    <button
+                        type="button"
+                        class="btn btn-block"
+                        type="submit"
+                        (click)="sendPasswordResetEmail(userEmail.value)"
+                    >
+                    <a href="">Reset Password</a>
+                    </button>
+                </p>
+
+                <button type="button" class="btn btn-outline-primary" (click)="authService.facebookAuth()">
+                    <i class="fa fa-google" aria-hidden="true">Login with Facebook</i>
                 </button>
+                <br><br>
+                <button type="button" class="btn btn-outline-primary" (click)="authService.twitterAuth()">
+                    <i class="fa fa-google" aria-hidden="true">Login with Twitter</i>
+                </button>
+                <br><br>
+                <button type="button" class="btn btn-outline-primary" (click)="authService.googleAuth()">
+                    <i class="fa fa-google" aria-hidden="true">Login with Google</i>
+                </button> 
+
               </form>
-              <p>
-                Don't have an account?
-                <a [routerLink]="['/register']"> Sign up here </a>
-              </p>
+            
             </div>
           </div>
         </div>
