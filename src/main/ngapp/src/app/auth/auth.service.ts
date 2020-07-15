@@ -42,8 +42,9 @@ export class AuthService {
         localStorage.setItem('user', JSON.stringify(res.user));
         this.router.navigate(['/chat']);
       })
-      .catch((err: any) => {
-        console.error('Something is wrong:', err.message);
+      .catch((error: any) => {
+        console.log('Something is wrong:', error.message);
+        window.alert(error.message);
       });
   }
 

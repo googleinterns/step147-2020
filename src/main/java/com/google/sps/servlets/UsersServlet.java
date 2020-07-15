@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
 import com.google.sps.servlets.User;
 
 /** Servlet that holds the users on this WebApp */
-@WebServlet("/users")
+@WebServlet("/listUsers")
 public class UsersServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -43,18 +43,18 @@ public class UsersServlet extends HttpServlet {
         ArrayList<User> users = new ArrayList<User>();
 
         for (Entity user : results.asIterable()) {
-           String userId = (String) user.getProperty("userId");
-           String name = (String) user.getProperty("name");
-           String email = (String) user.getProperty("email");
-           String language = (String) user.getProperty("language");
+            String userId = (String) user.getProperty("userId");
+            String name = (String) user.getProperty("name");
+            String email = (String) user.getProperty("email");
+            String language = (String) user.getProperty("language");
 
-           User userInstance = new User(userId, name, email, language);
-
-           if(userId != userID){
-               users.add(userInstance);
-           }
+            User userInstance = new User(userId, name, email, language);
+            System.out.println(user);
+            if (!(userInstance.userId.equals(userID))){
+                users.add(userInstance);
+            }
         }
-
+        System.out.println(users);
         Gson gson = new Gson();
 
         response.setContentType("application.json");
