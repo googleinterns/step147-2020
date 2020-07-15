@@ -19,12 +19,9 @@ export class ChatBarComponent implements OnInit {
   ngOnInit(): void {
     const localUser = JSON.parse(localStorage.getItem("user"));
     this.currId = localUser.uid;
-    console.log("In chat bar, users: ", this.users);
-    console.log("In chat bar, userId: ", this.currId);
   }
 
   onSelect(id: string){
-      console.log("Emit id: ", id);
       this.changeChat.emit(id);
   }
 
