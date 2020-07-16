@@ -5,7 +5,8 @@
 } 
 
 .msg_history {
-	overflow-y: auto;
+    height: 80%;
+	overflow-y:scroll;
 }
 
 .message {
@@ -31,7 +32,7 @@
 
 .outgoing_msg {
 	overflow: hidden;
-	margin: 26px 0 26px;
+	margin: 5px 0 5px;
 }
 
 .sent_msg {
@@ -90,4 +91,8 @@
 
 .send_btn{
     flex:1;
+}
+
+.incoming_msg{
+    padding: 5px 0 5px;
 }
