@@ -31,8 +31,7 @@ export class AuthService {
   constructor(public afAuth: AngularFireAuth, private router: Router, private http: HttpClient) {
     this.afAuth.authState.subscribe((user) => {
       if (user) {
-        this.user = user;
-        localStorage.setItem('user', JSON.stringify(this.user));
+        localStorage.setItem('user', JSON.stringify(user));
       } else {
         localStorage.setItem('user', null);
       }

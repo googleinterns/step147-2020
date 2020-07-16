@@ -60,7 +60,7 @@ public class ChatroomServlet extends HttpServlet {
                 new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
 
         PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
-
+        
         ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
         for (Entity chatroom : chatrooms.asIterable()) {
             Chatroom currChatRoom = new Chatroom(chatroom);
