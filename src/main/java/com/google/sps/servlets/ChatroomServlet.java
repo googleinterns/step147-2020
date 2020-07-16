@@ -58,8 +58,9 @@ public class ChatroomServlet extends HttpServlet {
 
         Query chatroomQuery = new Query("chatroom");
         chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(
-                new FilterPredicate("user1", FilterOperator.EQUAL, userID),
-                new FilterPredicate("user2", FilterOperator.EQUAL, recipientID))));
+                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user1", FilterOperator.EQUAL, recipientID))),
+                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user2", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, recipientID)))
+            )));
 
         Entity chatroom = datastore.prepare(chatroomQuery).asSingleEntity();
 
@@ -68,7 +69,7 @@ public class ChatroomServlet extends HttpServlet {
         }
 
         // Check to see if chatroom is empty and make new chatroom
-        if (chatroomID == "null") {
+        if (chatroomID.equals("null")) {
             Entity newChatroom = new Entity("chatroom");
             chatroomID = UUID.randomUUID().toString();
             newChatroom.setProperty("chatroomId", chatroomID);
@@ -79,14 +80,12 @@ public class ChatroomServlet extends HttpServlet {
 
         // go through messages and grabs the messages with chatroomID = to the chatroomID passed in
         // then sorts them by timestamp
-        Query messageQuery = new Query("message");
-        messageQuery.setFilter(new FilterPredicate("chatroomId", FilterOperator.EQUAL, chatroomID));
-        messageQuery.addSort("timestamp", SortDirection.ASCENDING);
-
+        Query messageQuery = new Query("message").addSort("timestamp", SortDirection.ASCENDING);
+        // messageQuery.setFilter(new FilterPredicate("chatroomId", FilterOperator.EQUAL, chatroomID));
         PreparedQuery results = datastore.prepare(messageQuery);
-
         ArrayList<Message> messagesInChatroom = new ArrayList<Message>();
         for (Entity message : results.asIterable()) {
+
             String messageId = (String) message.getProperty("messageId");
             String chatroomId = (String) message.getProperty("chatroomId");
             String text = (String) message.getProperty("text");
@@ -96,7 +95,9 @@ public class ChatroomServlet extends HttpServlet {
             Long timestamp = (Long) message.getProperty("timestamp");
 
             Message messageInstance = new Message(messageId, chatroomId, text, translatedText, senderId, recipientId, timestamp);
-            messagesInChatroom.add(messageInstance);
+            if(chatroomId.equals(chatroomID)){
+                messagesInChatroom.add(messageInstance);
+            }
         }
         
         Gson gson = new Gson();
@@ -139,7 +140,6 @@ public class ChatroomServlet extends HttpServlet {
         PreparedQuery users = datastore.prepare(userQuery);
         String lang = "";
         for (Entity user: users.asIterable()){
-            System.out.println("Getting language");
             String userLang = (String) user.getProperty("userId");
             if (userLang.equals(newPost.recipientId)){
                 lang = (String) user.getProperty("language");
