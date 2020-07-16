@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { LocationStrategy, HashLocationStrategy } from '../../node_modules/@angular/common';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
@@ -27,7 +27,7 @@ const firebaseConfig = {
   storageBucket: "team147-step2020.appspot.com",
   messagingSenderId: "656351090386",
   appId: "1:656351090386:web:92adc8b6ca7ef1393aff0b",
-  measurementId: "G-25QMK9RGPP",
+  measurementId: "G-25QMK9RGPP"
 };
 
 @NgModule({
