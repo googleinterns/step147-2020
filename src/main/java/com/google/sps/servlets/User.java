@@ -1,4 +1,5 @@
 package com.google.sps.servlets;
+import com.google.appengine.api.datastore.Entity;
 
 public class User {
     String userId;
@@ -11,5 +12,12 @@ public class User {
         this.name = name;
         this.email = email;
         this.language = language;
+    }
+
+    public User(Entity entity) {
+        this.userId = (String) entity.getProperty("userId");
+        this.name = (String) entity.getProperty("name");
+        this.email = (String) entity.getProperty("email");
+        this.language = (String) entity.getProperty("language");
     }
 }
