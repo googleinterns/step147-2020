@@ -14,10 +14,6 @@
 
 package com.google.sps.servlets;
 
-import java.io.ByteArrayInputStream;
-import javax.servlet.ReadListener;
-import java.nio.charset.StandardCharsets;
-import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import com.google.gson.Gson;
@@ -29,8 +25,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.StringReader;
 import javax.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,29 +55,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import com.google.sps.servlets.User;
-import static com.google.appengine.api.datastore.FetchOptions.Builder.withLimit;
-import static org.junit.Assert.assertEquals;
-import java.io.IOException;
-import java.time.Instant;
-import org.junit.After;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import java.io.Reader;
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
-public class ChatroomServletTest {
+@RunWith(JUnit4.class)
+public class MessageServletTest {
 
     private Entity caller;
     private Entity user1;
@@ -94,7 +69,6 @@ public class ChatroomServletTest {
     private Entity message4;
     private Entity chatroom1;
     private Entity chatroom2;
-    private Entity chatroom3;
 
     private ArrayList<Entity> messages = new ArrayList<Entity>();
 
@@ -132,11 +106,6 @@ public class ChatroomServletTest {
         chatroom2.setProperty("chatroomId", "2");
         chatroom2.setProperty("user1", (String) caller.getProperty("userId"));
         chatroom2.setProperty("user2", (String) user2.getProperty("userId"));
-
-        chatroom3 = new Entity("chatroom");
-        chatroom3.setProperty("chatroomId", "3");
-        chatroom3.setProperty("user1", (String) user1.getProperty("userId"));
-        chatroom3.setProperty("user2", (String) caller.getProperty("userId"));
 
         message1 = new Entity("message");
         message1.setProperty("messageId", "1");
@@ -185,47 +154,78 @@ public class ChatroomServletTest {
         helper.tearDown();
     }
 
-    /**
-    * Tests how the servlet fetches a specific user from the datastore.
-    */
     @Test
     public void testDoGet() throws IOException, ServletException {
 
-        // add random users to the database
         DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
-
+        
         localDatabase.put(caller);
         localDatabase.put(user1);
         localDatabase.put(user2);
 
         localDatabase.put(chatroom1);
         localDatabase.put(chatroom2);
-        localDatabase.put(chatroom3);
+
+        for (Entity message: messages) {
+            localDatabase.put(message);
+        }
+        
+        MessageServlet messageServlet = new MessageServlet();
+
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
+
+        Mockito.when(request.getParameter("userId")).thenReturn((String) user1.getProperty("userId"));
+        Mockito.when(request.getParameter("recipientId")).thenReturn((String) user2.getProperty("userId"));
+        
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
+
+        Gson gson = new Gson();
+
+        messageServlet.doGet(request, response);
+
+        ArrayList<Message> messagesInChatroom = new ArrayList<Message>();
+        messagesInChatroom.add(new Message(message1));
+        messagesInChatroom.add(new Message(message2));
+        messagesInChatroom.add(new Message(message3));
+        
+        Mockito.verify(printWriter).println(gson.toJson(messagesInChatroom));
+        Mockito.verify(response).setContentType("application/json");
+    }
+
+    @Test
+    public void testDoGetServletMakesNewChatroom() throws IOException, ServletException {
+
+        DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
+        
+        localDatabase.put(caller);
+        localDatabase.put(user1);
+        localDatabase.put(user2);
+
+        localDatabase.put(chatroom1);
+        localDatabase.put(chatroom2);
 
         for (Entity message: messages) {
             localDatabase.put(message);
         }
 
-        ChatroomServlet chatroomServlet = new ChatroomServlet();
+        MessageServlet messageServlet = new MessageServlet();
 
-        // mock objects for the execution of the test
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId")).thenReturn((String) caller.getProperty("userId"));
+        Mockito.when(request.getParameter("userId")).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(request.getParameter("recipientId")).thenReturn(UUID.randomUUID().toString());
+        
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        chatroomServlet.doGet(request, response);
-
-        ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
-        chatroomsList.add(new Chatroom(chatroom2));
-        chatroomsList.add(new Chatroom(chatroom3));
 
         Gson gson = new Gson();
 
-        // ensures that the request writes the correct user as a response
+        messageServlet.doGet(request, response);
+
+        Mockito.verify(printWriter).println(gson.toJson(new ArrayList<Message>()));
         Mockito.verify(response).setContentType("application/json");
-        Mockito.verify(printWriter).println(gson.toJson(chatroomsList));
     }
 }
