@@ -1,5 +1,3 @@
-declare const Pusher: any;
-
 import { Injectable } from '@angular/core';
 import { Message } from './models/message';
 import { Chatroom } from './models/chatroom';
@@ -15,8 +13,6 @@ import { environment } from './../environments/environment';
   providedIn: 'root',
 })
 export class ChatDataService {
-  pusher: any;
-  channel: any;
 
   constructor(private authService: AuthService, private http: HttpClient ) {} 
 
@@ -47,29 +43,11 @@ export class ChatDataService {
   }
 
   // Get a chatroom for a recepient;
-  getChatroom(recipient: string): string {
-    let chat: string = "";
+  getChatroom(recipient: string): Observable<Chatroom> {
     var localUser = JSON.parse(localStorage.getItem("user"));
     const url: string = "/getChatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
     
-    const promise = this.http.get<Chatroom>(url).toPromise();
-    promise.then(res => {
-        console.log("Chatroom Id: ", res[0].chatroomId);
-        chat = res[0].chatroomId;
-        this.setPusher(chat);
-        return chat;
-    }).catch(err => console.error(err));
-
-    return chat;
-  }
-
-  // Set pusher to new channel.
-  setPusher(chatroom: string){
-    this.pusher = new Pusher(environment.pusher.key, {
-        cluster: environment.pusher.cluster,
-        encrypted: true
-    });
-    this.channel = this.pusher.subscribe(chatroom);
+    return this.http.get<Chatroom>(url);
   }
  
   // Add message in a new chatroom.
