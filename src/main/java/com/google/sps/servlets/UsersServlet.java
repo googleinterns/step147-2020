@@ -43,18 +43,16 @@ public class UsersServlet extends HttpServlet {
         ArrayList<User> users = new ArrayList<User>();
 
         for (Entity user : results.asIterable()) {
-            String userId = (String) user.getProperty("userId");
-            String name = (String) user.getProperty("name");
-            String email = (String) user.getProperty("email");
-            String language = (String) user.getProperty("language");
+            // String userId = (String) user.getProperty("userId");
+            // String name = (String) user.getProperty("name");
+            // String email = (String) user.getProperty("email");
+            // String language = (String) user.getProperty("language");
 
-            User userInstance = new User(userId, name, email, language);
-            System.out.println(user);
+            User userInstance = new User(user);
             if (!(userInstance.userId.equals(userID))){
                 users.add(userInstance);
             }
         }
-        System.out.println(users);
         Gson gson = new Gson();
 
         response.setContentType("application.json");

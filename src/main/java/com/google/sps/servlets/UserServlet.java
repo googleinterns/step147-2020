@@ -26,7 +26,6 @@ import com.google.datastore.v1.TransactionOptions.ReadOnly;
 import com.google.cloud.datastore.Cursor;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.DatastoreException;
-//import com.google.cloud.datastore.Entity;
 import com.google.cloud.datastore.EntityQuery;
 import com.google.cloud.datastore.FullEntity;
 import com.google.cloud.datastore.IncompleteKey;
@@ -35,7 +34,6 @@ import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.ListValue;
 import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.ProjectionEntity;
-//import com.google.cloud.datastore.Query;
 import com.google.cloud.datastore.QueryResults;
 import com.google.cloud.datastore.ReadOption;
 import com.google.cloud.datastore.StringValue;
@@ -53,7 +51,6 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
-//import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -64,7 +61,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-//import com.google.datastore.v1.PropertyFilter;
 import com.google.datastore.v1.Query.Builder;
 import com.google.sps.servlets.User;
 
@@ -77,31 +73,22 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         String userID = request.getParameter("userId");
 
         Query query = new Query("user");
         query.setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userID));
 
+        Entity userEntity = database.prepare(query).asSingleEntity();
+        
+        User user = new User(userEntity);
         PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
 
-        ArrayList<User> users = new ArrayList<User>();
-        for (Entity user : results.asIterable()) {
-            String currUserId = (String) user.getProperty("userId");
-            if (currUserId.equals(userID)){
-                String userId = (String) user.getProperty("userId");
-                String name = (String) user.getProperty("name");
-                String email = (String) user.getProperty("email");
-                String language = (String) user.getProperty("language");
-
-                User userInstance = new User(userId, name, email, language);
-                users.add(userInstance);
-            }
-        }
 
         Gson gson = new Gson();
 
         response.setContentType("application/json");
-        response.getWriter().println(gson.toJson(users));
+        response.getWriter().println(gson.toJson(user));
     }
 
     @Override
@@ -115,7 +102,6 @@ public class UserServlet extends HttpServlet {
         newUser.setProperty("email", userInput.email);
         newUser.setProperty("language", userInput.language);
 
-        //System.out.println(IOUtils.toString(request.getInputStream()));
         database.put(newUser);
     }
 }
