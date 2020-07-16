@@ -16,6 +16,8 @@ import { User as LocalUser } from '../models/user';
 })
 export class AuthService {
 
+  user: User;
+
   private eventAuthError = new BehaviorSubject<string>("");
   eventAuthError$ = this.eventAuthError.asObservable();
   userSample: LocalUser;
@@ -129,7 +131,8 @@ export class AuthService {
     });
     return this.afAuth.signInWithPopup(provider)
     .then((result) => {
-      
+      localStorage.setItem('user', JSON.stringify(result.user));
+
       // Set user data if it is the first time the user is loggin in.
       if(result.additionalUserInfo.isNewUser) {
         this.userInstance2 = {

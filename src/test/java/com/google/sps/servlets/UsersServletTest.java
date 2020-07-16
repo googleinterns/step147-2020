@@ -121,8 +121,8 @@ public class UsersServletTest {
 
         ArrayList<User> users = new ArrayList<User>();
 
-        User userObject1 = new User((String) user1.getProperty("userId"), (String) user1.getProperty("name"), (String) user1.getProperty("email"), (String) user1.getProperty("language"));
-        User userObject2 = new User((String) user2.getProperty("userId"), (String) user2.getProperty("name"), (String) user2.getProperty("email"), (String) user2.getProperty("language"));
+        User userObject1 = new User(user1);
+        User userObject2 = new User(user2);
 
         users.add(userObject1);
         users.add(userObject2);

@@ -145,19 +145,12 @@ public class UserServletTest {
 
         userServlet.doGet(request, response);
 
-        ArrayList<User> users = new ArrayList<User>();
-
-        User user = new User((String) caller.getProperty("userId"),
-        (String) caller.getProperty("name"),
-        (String) caller.getProperty("email"),
-        (String) caller.getProperty("language"));
-
-        users.add(user);
+        User user = new User(caller);
 
         Gson gson = new Gson();
 
         // ensures that the request writes the correct user as a response
         Mockito.verify(response).setContentType("application/json");
-        Mockito.verify(printWriter).println(gson.toJson(users));
+        Mockito.verify(printWriter).println(gson.toJson(user));
     }
 }
