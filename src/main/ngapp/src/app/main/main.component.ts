@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatDataService } from '../chat-data.service';
+import { PusherService } from '../pusher.service';
 import { User } from '../models/user';
 import { Message } from '../models/message';
 import { Post } from '../models/post';
@@ -17,7 +18,7 @@ export class MainComponent implements OnInit {
   currId: string;
   chatroom: string;
 
-  constructor(private chatService: ChatDataService) {}
+  constructor(private chatService: ChatDataService, private pusher: PusherService) {}
 
   ngOnInit(): void {
     const localUser = JSON.parse(localStorage.getItem("user"));
@@ -36,12 +37,14 @@ export class MainComponent implements OnInit {
 
     promise.then(messages => {
         this.messages = messages;
-        this.chatroom = this.chatService.getChatroom(recipientId);
-
-        this.chatService.channel.bind('new-message', data => {
-            this.messages.push(JSON.parse(data));
+        const newPromise = this.chatService.getChatroom(recipientId).toPromise();
+        newPromise.then(res => {
+            const chatroomId = res[0].chatroomId;
+            this.pusher.setPusher(chatroomId);
+            this.pusher.channel.bind('new-message', data => {
+                this.messages.push(JSON.parse(data));
+            });
         });
-
     });
     
   }
