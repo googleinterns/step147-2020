@@ -15,8 +15,9 @@ export class MainComponent implements OnInit {
   users: User[];
   currentRecipient: string;
   messages: Message[];
+  chatrooms: Chatroom[];
   currId: string;
-  chatroom: string;
+  currChatroomId: string;
 
   constructor(private chatService: ChatDataService, private pusher: PusherService) {}
 
@@ -24,28 +25,39 @@ export class MainComponent implements OnInit {
     const localUser = JSON.parse(localStorage.getItem("user"));
     this.currId = localUser.uid;
 
-    const promise = this.chatService.getUsers().toPromise();
-    promise.then(users => {
+    const usersPromise = this.chatService.getUsers().toPromise();
+    usersPromise.then(users => {
         this.users = users;
     });
+
+    const chatroomsPromise = this.chatService.getChatrooms().toPromise();
+    chatroomsPromise.then(chatrooms => {
+        this.chatrooms = chatrooms;
+    })
 
   }
 
   onChange(recipientId: string) {
+    
     this.currentRecipient = recipientId;
-    const promise = this.chatService.getMessages(recipientId).toPromise();
 
-    promise.then(messages => {
-        this.messages = messages;
-        const newPromise = this.chatService.getChatroom(recipientId).toPromise();
-        newPromise.then(res => {
-            const chatroomId = res[0].chatroomId;
+    const chatroomPromise = this.chatService.getChatroom(recipientId).toPromise();
+
+    chatroomPromise.then(res => {
+
+        const chatroomId = res[0].chatroomId;
+        this.currChatroomId = chatroomId;
+
+        const messagePromise = this.chatService.getMessages(chatroomId).toPromise();
+        messagePromise.then(messages => {
+            this.messages = messages;
             this.pusher.setPusher(chatroomId);
             this.pusher.channel.bind('new-message', data => {
                 this.messages.push(JSON.parse(data));
             });
-        });
-    });
+        })
+        
+    })
     
   }
 
@@ -53,7 +65,8 @@ export class MainComponent implements OnInit {
     const newPost : Post = {
         senderId: this.currId,
         recipientId: this.currentRecipient,
-        text: newMessage
+        text: newMessage,
+        chatroomId: this.currChatroomId
     }
     this.chatService.addMessage(newPost);
   }
