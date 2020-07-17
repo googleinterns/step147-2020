@@ -101,7 +101,6 @@ public class UserServlet extends HttpServlet {
         newUser.setProperty("name", userInput.name);
         newUser.setProperty("email", userInput.email);
         newUser.setProperty("language", userInput.language);
-
         database.put(newUser);
     }
 }

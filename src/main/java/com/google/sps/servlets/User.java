@@ -2,10 +2,10 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.Entity;
 
 public class User {
-    String userId;
-    String name;
-    String email;
-    String language;
+    public String userId;
+    public String name;
+    public String email;
+    public String language;
 
     public User(String userID, String name, String email, String language) {
         this.userId = userID;

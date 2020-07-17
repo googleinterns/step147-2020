@@ -16,11 +16,9 @@ export class ChatDataService {
 
   constructor(private authService: AuthService, private http: HttpClient ) {} 
 
-  // Get the object associated with the currrent user.
+  // Get the object associated with the currrent user. 
   getUser(): Observable<User[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
-    console.log("UserId: ", localUser.uid);
-    console.log("Found local user in storage: ", localUser.uid);
     return this.http.get<User[]>("/user?userId="+localUser.uid);
   }
 
@@ -36,23 +34,29 @@ export class ChatDataService {
   }
 
   // Get messages between two users.
-  getMessages(recipient: string): Observable<Message[]> {
+  getMessages(id: string): Observable<Message[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
-    const url: string = "/chatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
+    const url: string = "/messages?chatroomId=" + id;
     return this.http.get<Message[]>(url);
   }
 
   // Get a chatroom for a recepient;
-  getChatroom(recipient: string): Observable<Chatroom> {
+  getChatroom(recipient: string): Observable<Chatroom[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
     const url: string = "/getChatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
-    
-    return this.http.get<Chatroom>(url);
+    return this.http.get<Chatroom[]>(url);
+  }
+
+  // Get all chatrooms.
+  getChatrooms(): Observable<Chatroom[]> {
+      var localUser = JSON.parse(localStorage.getItem("user"));
+      const url: string = "/chatrooms?userId=" + localUser.uid;
+        return this.http.get<Chatroom[]>(url);
   }
  
   // Add message in a new chatroom.
   addMessage(input: Post){
-    const promise = this.http.post<Post>("/chatroom", input).toPromise();
+    const promise = this.http.post<Post>("/messages", input).toPromise();
     promise.catch(err => console.error("Error sending new message: ", err));
 
   }
