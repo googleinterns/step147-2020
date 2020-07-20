@@ -1,36 +1,26 @@
-<div class="heading">
-    <div class="headind_srch"></div>
-</div>
-
-<div class="msg_history">
-    <li class="message" *ngFor="let message of messages">
-        <div
-                *ngIf="
-                  message.senderId !== currId;
-                  then incoming_msg;
-                  else outgoing_msg
-                "
-        ></div>
+<nb-chat [title]="title">
+    <div *ngFor="let message of messages">
+        <div  
+            *ngIf="
+                message.senderId !== currId;
+                then incoming_msg;
+                else outgoing_msg
+        "></div>
         <ng-template #incoming_msg>
-            <div class="incoming_msg">
-                    <div class="received_withd_msg">
-                        <p> {{ message.translatedText }} </p>
-                    </div>
-            </div>
+            <nb-chat-message 
+                   [message]="message.translatedText"
+                   [reply]="'true'"
+                   [date]="message.date" >
+            </nb-chat-message>
         </ng-template>
         <ng-template #outgoing_msg>
-            <div class="outgoing_msg">
-                <div class="sent_msg">
-                    <p> {{ message.text }} </p>
-                </div>
-            </div>
+                <nb-chat-message *ngFor="let message of messages"
+                    [message]="message.text"
+                    [reply]="'false'"
+                    [date]="message.timestamp" >
+                </nb-chat-message>
         </ng-template>
-    </li>
-</div>
-<div class="chat_input">
-    <form class = "flex" (click)="sendMessage()">
-        <input class="form-control input" type="text" placeholder="Type a mesage" name="newMessage" [(ngModel)]="newMessage">
-        <button type="submit" class="btn btn-primary mb-2 send_btn" (click)="sendMessage()">Send</button>
-    </form>
-</div>
-
+    </div>
+    
+  <nb-chat-form (send)="sendMessage($event)"></nb-chat-form>
+</nb-chat>

@@ -144,6 +144,7 @@ public class MessageServlet extends HttpServlet {
         Translate translate = TranslateOptions.getDefaultInstance().getService();
         Translation translation = translate.translate(newPost.text, Translate.TranslateOption.targetLanguage(lang));
         String translatedText = translation.getTranslatedText();
+        // String translatedText = newPost.text;
 
         Entity newMessage = new Entity("message");
         String messageUUID = UUID.randomUUID().toString();

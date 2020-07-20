@@ -12,12 +12,22 @@ import { Chatroom } from '../models/chatroom';
   styleUrls: ['./main.component.css'],
 })
 export class MainComponent implements OnInit {
+  keyword = "name";
   users: User[];
+  chatroomUsers: User[];
   currentRecipient: string;
   messages: Message[];
   chatrooms: Chatroom[];
   currId: string;
   currChatroomId: string;
+
+//   chatroomUsers: { name: string, title: string }[] = [
+//     { name: 'Carla Espinosa', title: 'Nurse' },
+//     { name: 'Bob Kelso', title: 'Doctor of Medicine' },
+//     { name: 'Janitor', title: 'Janitor' },
+//     { name: 'Perry Cox', title: 'Doctor of Medicine' },
+//     { name: 'Ben Sullivan', title: 'Carpenter and photographer' },
+//   ];
 
   constructor(private chatService: ChatDataService, private pusher: PusherService) {}
 
@@ -27,15 +37,46 @@ export class MainComponent implements OnInit {
 
     const usersPromise = this.chatService.getUsers().toPromise();
     usersPromise.then(users => {
-        this.users = users;
+        this.users = users.filter(user => user.userId !== this.currId);
+        const chatroomsPromise = this.chatService.getChatrooms().toPromise();
+        chatroomsPromise.then(chatrooms => {
+            this.chatrooms = chatrooms;
+            this.filterChatroomUsers();
+        })
     });
 
-    const chatroomsPromise = this.chatService.getChatrooms().toPromise();
-    chatroomsPromise.then(chatrooms => {
-        this.chatrooms = chatrooms;
-    })
+    
 
   }
+
+  chatroomContains(id: string){
+      let returned = false;
+      this.chatrooms.forEach(chatroom => {
+          console.log(chatroom);
+          console.log("Passed in id:", id);
+          if(chatroom.users.includes(id)){
+              returned = true;
+          }
+      });
+
+      return returned;
+  }
+
+  filterChatroomUsers(){
+    let localUsers : User[] = [];
+    this.users.forEach(user => {
+        let returned = false;
+        returned = this.chatroomContains(user.userId);
+        if(returned){
+            localUsers.push(user);
+        }
+    });
+
+    console.log(localUsers);
+    this.chatroomUsers = localUsers;
+  }
+
+  
 
   onChange(recipientId: string) {
     
@@ -52,10 +93,10 @@ export class MainComponent implements OnInit {
         messagePromise.then(messages => {
             this.messages = messages;
             this.pusher.setPusher(chatroomId);
-            this.pusher.channel.bind('new-message', data => {
-                this.messages.push(JSON.parse(data));
-            });
-        })
+        });
+        this.pusher.channel.bind('new-message', data => {
+            this.messages.push(JSON.parse(data));
+        });
         
     })
     
@@ -69,6 +110,18 @@ export class MainComponent implements OnInit {
         chatroomId: this.currChatroomId
     }
     this.chatService.addMessage(newPost);
+  }
+
+  selectUser(user){
+    console.log("Selected user: ", user.userId);
+    const chatroomsPromise = this.chatService.getChatrooms().toPromise();
+    chatroomsPromise.then(chatrooms => {
+        this.chatrooms = chatrooms;
+    });
+
+    this.onChange(user.userId);
+    this.filterChatroomUsers();
+    console.log("Chatroom users, ", this.chatroomUsers);
   }
 
   logout(): void {
