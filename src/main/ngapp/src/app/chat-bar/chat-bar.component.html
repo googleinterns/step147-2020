@@ -1,19 +1,7 @@
-<!-- <div *ngIf="users">
-    <div class="channels" *ngFor="let user of users">
-        <div class="chat_list" *ngIf="user.userId != currId">
-            <div class="chat_people"  (click)="onSelect(user.userId)">
-                <div class="chat_ib" >
-                    <div class ="chat_name"> {{ user.name }} </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
 <nb-card>
     <nb-list>
         <nb-list-item *ngFor="let user of users">
-            <nb-user [name]="user.name">
+            <nb-user [name]="user.name" (click)= "onSelect(user.userId)">
             </nb-user>
         </nb-list-item>
     </nb-list>
