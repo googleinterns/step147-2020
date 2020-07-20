@@ -96,3 +96,8 @@
 .incoming_msg{
     padding: 5px 0 5px;
 }
+
+nb-chat{
+    width: 100%;
+    height: 100%;
+}
