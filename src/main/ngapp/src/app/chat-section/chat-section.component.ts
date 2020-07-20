@@ -11,16 +11,13 @@ export class ChatSectionComponent implements OnInit {
 
   @Output() emitMessage : EventEmitter<String> = new EventEmitter();
   @Input() messages : Message[];
-  
+
   currId: string;
   newMessage = '';
-  title = "Username";
 
   constructor() { }
 
   ngOnInit(){
-    const localUser = JSON.parse(localStorage.getItem("user"));
-    this.currId = localUser.uid;
   }
 
   sendMessage(event){
