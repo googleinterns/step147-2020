@@ -14,6 +14,7 @@ export class ChatSectionComponent implements OnInit {
   
   currId: string;
   newMessage = '';
+  title = "Username";
 
   constructor() { }
 
@@ -22,13 +23,13 @@ export class ChatSectionComponent implements OnInit {
     this.currId = localUser.uid;
   }
 
-  sendMessage(){
+  sendMessage(event){
 
     if(this.newMessage.trim() === ''){
         return;
     }
  
-    this.emitMessage.emit(this.newMessage);
+    this.emitMessage.emit(event.message);
     this.newMessage = '';
   }
 
