@@ -17,6 +17,7 @@ export class MainComponent implements OnInit {
   chatroomUsers: User[];
   currentRecipient: string;
   messages: Message[];
+  selectedUser : User;
   chatrooms: Chatroom[];
   currId: string;
   currChatroomId: string;
@@ -78,11 +79,10 @@ export class MainComponent implements OnInit {
 
   
 
-  onChange(recipientId: string) {
-    
-    this.currentRecipient = recipientId;
-
-    const chatroomPromise = this.chatService.getChatroom(recipientId).toPromise();
+  onChange(user: User) {
+    this.selectedUser = user;
+    this.currentRecipient = user.userId;
+    const chatroomPromise = this.chatService.getChatroom(user.userId).toPromise();
 
     chatroomPromise.then(res => {
 

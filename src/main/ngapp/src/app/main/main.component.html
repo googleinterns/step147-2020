@@ -33,6 +33,7 @@
         <app-chat-section 
         class="mesgs"
         [messages]="messages"
+        [selectedUser]="selectedUser"
         (emitMessage)="onNewMessage($event)"
         ></app-chat-section>
       </div>
