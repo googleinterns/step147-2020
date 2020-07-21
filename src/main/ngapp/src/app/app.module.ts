@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
-import {AutocompleteLibModule} from 'angular-ng-autocomplete';
+import { AutocompleteLibModule} from 'angular-ng-autocomplete';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 
+import { ChangeUserInfoComponent } from './change-user-info/change-user-info.component';
 import { ChatBarComponent } from './chat-bar/chat-bar.component';
 import { ChatSectionComponent } from './chat-section/chat-section.component';
 import { LoginComponent } from './login/login.component';
@@ -57,6 +58,7 @@ const firebaseConfig = {
     RegisterComponent,
     MainComponent,
     ConfirmEqualValidatorDirective,
+    ChangeUserInfoComponent,
     SelectLanguageComponent
   ],
   imports: [

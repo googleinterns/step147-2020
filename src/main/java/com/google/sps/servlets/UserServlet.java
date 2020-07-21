@@ -95,12 +95,31 @@ public class UserServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String jsonString = IOUtils.toString((request.getInputStream()));
         User userInput = new Gson().fromJson(jsonString, User.class);
+
+        String userID = userInput.userId;
         
-        Entity newUser = new Entity("user");
+        // Entity with a userID as identifier.
+        Entity newUser = new Entity("user", userID);
         newUser.setProperty("userId", userInput.userId);
         newUser.setProperty("name", userInput.name);
         newUser.setProperty("email", userInput.email);
         newUser.setProperty("language", userInput.language);
         database.put(newUser);
+    }
+
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String jsonString = IOUtils.toString((request.getInputStream()));
+        User userInput = new Gson().fromJson(jsonString, User.class);
+        String userID = userInput.userId;
+        
+        // Update user using userId as entity identifier.
+        Entity userToUpdate = new Entity("user", userID);
+        userToUpdate.setProperty("userId", userInput.userId);
+        userToUpdate.setProperty("name", userInput.name);
+        userToUpdate.setProperty("email", userInput.email);
+        userToUpdate.setProperty("language", userInput.language);
+
+        database.put(userToUpdate);
     }
 }
