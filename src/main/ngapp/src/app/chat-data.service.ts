@@ -23,8 +23,8 @@ export class ChatDataService {
   }
 
   // Create a new user object for the user.
-  addUser(user: User): void{
-    this.http.post("/user", user);
+  addUser(user: User): Observable<any> {
+    return this.http.post("/user", user);
   }
 
   // Get a list of all the users in our service.
