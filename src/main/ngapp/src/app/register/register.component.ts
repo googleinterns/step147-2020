@@ -20,9 +20,10 @@ export class RegisterComponent implements OnInit {
   ngOnInit() {}
 
   createUser(frm): void {
+
     this.registerAwait = true;
     this.authService.register(frm).then((res) => {
-
+        
         const userInstance : User = {
                 userId : res.user.uid,
                 name : frm.firstName + " " + frm.lastName,
