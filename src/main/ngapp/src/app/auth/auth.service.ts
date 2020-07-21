@@ -46,7 +46,8 @@ export class AuthService {
   // Registration function.
   register(user: any): Promise<any> {
     return this.afAuth.createUserWithEmailAndPassword(user.email, user.password).then((res) => {
-        localStorage.setItem('user', JSON.stringify(res.user));    
+        localStorage.setItem('user', JSON.stringify(res.user));
+        return res;    
     });
   }
 
