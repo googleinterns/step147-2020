@@ -29,6 +29,11 @@ import {
   NbListModule,
   NbChatModule,
   NbSpinnerModule,
+  NbInputModule,
+  NbButtonModule,
+  NbAlertModule,
+  NbIconModule,
+  NbSelectModule,
 } from '@nebular/theme';
 
 // My web app's Firebase configuration.
@@ -73,6 +78,11 @@ const firebaseConfig = {
     NbListModule,
     NbChatModule,
     NbSpinnerModule,
+    NbInputModule,
+    NbButtonModule,
+    NbAlertModule,
+    NbIconModule,
+    NbSelectModule,
   ],
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
