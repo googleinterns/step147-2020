@@ -1,4 +1,4 @@
-@import "~bootstrap/dist/css/bootstrap.min.css";
+/* @import "~bootstrap/dist/css/bootstrap.min.css"; */
 .alignment {
     margin: 0 auto;
     text-align: left;
@@ -7,4 +7,29 @@
 }
 .row {
     max-width: 600px;
+}
+
+#back-arrow:hover{
+    font-size: 2em;
+}
+
+nb-card{
+    width: 600px;
+    margin: 5% auto;
+}
+
+input{
+    margin: 10px 5px;
+}
+
+.login_button{
+    margin: 10px 5px;
+}
+
+nb-select{
+    margin-left: 20px;
+}
+
+.error{
+    color: red;
 }
