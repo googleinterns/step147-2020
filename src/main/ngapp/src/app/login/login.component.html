@@ -52,17 +52,23 @@
                     </button>
                 </p>
 
-                <button type="button" class="btn btn-outline-primary" (click)="authService.facebookAuth()">
-                    <i class="fa fa-google" aria-hidden="true">Login with Facebook</i>
+                <button type="button" 
+                    mdbBtn color="fb" 
+                    class="waves-light" 
+                    (click)="authService.facebookAuth()"
+                    mdbWavesEffect>
+                    <i class="fab fa-facebook-f left"></i>
+                        Facebook Login
                 </button>
-                <br><br>
-                <button type="button" class="btn btn-outline-primary" (click)="authService.twitterAuth()">
-                    <i class="fa fa-google" aria-hidden="true">Login with Twitter</i>
+
+                <button type="button" 
+                    mdbBtn color="fb" 
+                    class="waves-light" 
+                    (click)="authService.googleAuth()"
+                    mdbWavesEffect>
+                    <i class="fab fa-google"></i>
+                        Google Login
                 </button>
-                <br><br>
-                <button type="button" class="btn btn-outline-primary" (click)="authService.googleAuth()">
-                    <i class="fa fa-google" aria-hidden="true">Login with Google</i>
-                </button> 
 
               </form>
             
