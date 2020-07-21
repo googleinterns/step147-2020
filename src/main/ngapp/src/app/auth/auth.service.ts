@@ -85,12 +85,6 @@ export class AuthService {
   }
 
   // Login with Facebook.
-  twitterAuth() {
-    return this.authLogin(new auth.TwitterAuthProvider());
-  } 
-
-
-  // Login with Facebook.
   facebookAuth() {
     return this.authLogin(new auth.FacebookAuthProvider());
   }  
