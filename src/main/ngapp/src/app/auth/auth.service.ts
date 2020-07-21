@@ -39,40 +39,15 @@ export class AuthService {
   }
 
   // Login function.
-  login(email: string, password: string): void {
-    this.afAuth
-      .signInWithEmailAndPassword(email, password)
-      .then((res: any) => {
-        localStorage.setItem('user', JSON.stringify(res.user));
-        this.router.navigate(['/chat']);
-      })
-      .catch((error: any) => {
-        console.log('Something is wrong:', error.message);
-        window.alert(error.message);
-      });
+  login(email: string, password: string): Promise<any> {
+    return this.afAuth.signInWithEmailAndPassword(email, password)
   }
 
   // Registration function.
-  register(user: any) {
-    this.afAuth
-    .createUserWithEmailAndPassword(user.email, user.password)
-    .then((res) => {
-        localStorage.setItem('user', JSON.stringify(res.user));
-        
-        const userInstance : LocalUser = {
-                userId : res.user.uid,
-                name : user.firstName + " " + user.lastName,
-                email: user.email,
-                language: user.language
-        };
-
-        const promise = this.http.post<LocalUser>("/user", userInstance).toPromise();
-        promise.then(response => {
-            this.router.navigate(['/chat']);
-        });
-        
-    })
-    .catch((err: any) => console.error('Error with registering user:', err.message));
+  register(user: any): Promise<any> {
+    return this.afAuth.createUserWithEmailAndPassword(user.email, user.password).then((res) => {
+        localStorage.setItem('user', JSON.stringify(res.user));    
+    });
   }
 
   // Function for sending email verification.
@@ -150,8 +125,6 @@ export class AuthService {
         this.router.navigate(['/chat']);
       }
 
-    }).catch((error) => {
-      window.alert(error)
-    })
+    });
   }
 }
