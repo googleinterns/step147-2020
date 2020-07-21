@@ -10,7 +10,7 @@ import { Chatroom } from '../models/chatroom';
 })
 export class ChatBarComponent implements OnInit {
   
-  @Output() changeChat: EventEmitter<any> = new EventEmitter();
+  @Output() changeChat: EventEmitter<User> = new EventEmitter();
 
   @Input() users: User[];
   @Input() chatrooms: Chatroom[];
@@ -28,8 +28,8 @@ export class ChatBarComponent implements OnInit {
 
   
 
-  onSelect(id: string){
-      this.changeChat.emit(id);
+  onSelect(user: User){
+      this.changeChat.emit(user);
   }
 
 }

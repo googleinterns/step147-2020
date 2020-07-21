@@ -12,7 +12,7 @@
 
 <nb-card>
     <nb-list>
-        <nb-list-item *ngFor="let user of users">
+        <nb-list-item *ngFor="let user of users" (click)="onSelect(user)">
             <nb-user [name]="user.name">
             </nb-user>
         </nb-list-item>

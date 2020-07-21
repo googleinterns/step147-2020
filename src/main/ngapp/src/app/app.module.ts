@@ -11,9 +11,7 @@ import { AppComponent } from './app.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 
-import { MDBBootstrapModule } from 'angular-bootstrap-md';
 import { ChangeUserInfoComponent } from './change-user-info/change-user-info.component';
-
 import { ChatBarComponent } from './chat-bar/chat-bar.component';
 import { ChatSectionComponent } from './chat-section/chat-section.component';
 import { LoginComponent } from './login/login.component';
@@ -32,6 +30,11 @@ import {
   NbListModule,
   NbChatModule,
   NbSpinnerModule,
+  NbInputModule,
+  NbButtonModule,
+  NbAlertModule,
+  NbIconModule,
+  NbSelectModule,
 } from '@nebular/theme';
 
 // My web app's Firebase configuration.
@@ -66,7 +69,6 @@ const firebaseConfig = {
     AngularFireAuthModule,
     RouterModule,
     HttpClientModule,
-    MDBBootstrapModule.forRoot(),
     AutocompleteLibModule,
     BrowserAnimationsModule,
     NbThemeModule.forRoot({ name: 'default' }),
@@ -78,6 +80,11 @@ const firebaseConfig = {
     NbListModule,
     NbChatModule,
     NbSpinnerModule,
+    NbInputModule,
+    NbButtonModule,
+    NbAlertModule,
+    NbIconModule,
+    NbSelectModule,
   ],
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
