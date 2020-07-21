@@ -10,3 +10,49 @@
     flex-direction: column;
     padding-top: 80px;
 }
+
+nb-card{
+    width: 400px;
+    margin: 5% auto;
+}
+
+input{
+    margin: 7px 5px;
+}
+
+.divider{
+    text-align: center;
+}
+
+#google{
+    background-color: white;
+}
+
+#facebook{
+    background-color: #3b5998;
+    color: white;
+}
+
+.social_button{
+    margin-top: 0px;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.login_button{
+    margin: 10px 5px;
+}
+
+.icon{
+    margin-right: 30px;
+    margin-left: 0;
+    width: "20px";
+}
+
+.register_link{
+    width: 80%;
+    text-align: center;
+    margin: 10px auto 5px;
+}
