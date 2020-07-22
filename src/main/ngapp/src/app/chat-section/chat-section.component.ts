@@ -5,34 +5,26 @@ import { User } from '../models/user';
 @Component({
   selector: 'app-chat-section',
   templateUrl: './chat-section.component.html',
-  styleUrls: ['./chat-section.component.css']
+  styleUrls: ['./chat-section.component.css'],
 })
-
 export class ChatSectionComponent implements OnInit {
+  @Output() emitMessage: EventEmitter<String> = new EventEmitter();
+  @Input() messages: Message[];
+  @Input() selectedUser: User;
 
-  @Output() emitMessage : EventEmitter<String> = new EventEmitter();
-  @Input() messages : Message[];
-  @Input() selectedUser : User;
-  
   currId: string;
-  newMessage = '';
-  title = "Username";
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(){
-    const localUser = JSON.parse(localStorage.getItem("user"));
+  ngOnInit() {
+    const localUser = JSON.parse(localStorage.getItem('user'));
     this.currId = localUser.uid;
   }
 
-  sendMessage(event){
-
-    if(this.newMessage.trim() === ''){
-        return;
+  sendMessage(event) {
+    if (event.message.trim() === '') {
+      return;
     }
- 
     this.emitMessage.emit(event.message);
-    this.newMessage = '';
   }
-
 }
