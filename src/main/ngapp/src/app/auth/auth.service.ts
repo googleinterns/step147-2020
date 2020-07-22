@@ -10,15 +10,13 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { User as LocalUser } from '../models/user';
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-
   user: User;
 
-  private eventAuthError = new BehaviorSubject<string>("");
+  private eventAuthError = new BehaviorSubject<string>('');
   eventAuthError$ = this.eventAuthError.asObservable();
   userSample: LocalUser;
   private userDataSource = new BehaviorSubject<LocalUser>(this.userSample);
@@ -26,9 +24,13 @@ export class AuthService {
   newUser: any;
   userInstance2: LocalUser;
 
-  // Subscribe to changes in a person's authentication state. If that authentication state changes, 
+  // Subscribe to changes in a person's authentication state. If that authentication state changes,
   // reflect that change in local storage.
-  constructor(public afAuth: AngularFireAuth, private router: Router, private http: HttpClient) {
+  constructor(
+    public afAuth: AngularFireAuth,
+    private router: Router,
+    private http: HttpClient
+  ) {
     this.afAuth.authState.subscribe((user) => {
       if (user) {
         localStorage.setItem('user', JSON.stringify(user));
@@ -40,15 +42,17 @@ export class AuthService {
 
   // Login function.
   login(email: string, password: string): Promise<any> {
-    return this.afAuth.signInWithEmailAndPassword(email, password)
+    return this.afAuth.signInWithEmailAndPassword(email, password);
   }
 
   // Registration function.
   register(user: any): Promise<any> {
-    return this.afAuth.createUserWithEmailAndPassword(user.email, user.password).then((res) => {
+    return this.afAuth
+      .createUserWithEmailAndPassword(user.email, user.password)
+      .then((res) => {
         localStorage.setItem('user', JSON.stringify(res.user));
-        return res;    
-    });
+        return res;
+      });
   }
 
   // Function for sending email verification.
@@ -75,7 +79,7 @@ export class AuthService {
         localStorage.removeItem('user');
         this.router.navigate(['/']);
       })
-      .catch((err: any) => console.error("Error with logging out user: ",err));
+      .catch((err: any) => console.error('Error with logging out user: ', err));
   }
 
   // Function to check if a user is logged in.
@@ -85,47 +89,23 @@ export class AuthService {
   }
 
   // Login with Facebook.
-  twitterAuth() {
-    return this.authLogin(new auth.TwitterAuthProvider());
-  } 
-
-
-  // Login with Facebook.
   facebookAuth() {
     return this.authLogin(new auth.FacebookAuthProvider());
-  }  
+  }
 
   // Login with Google.
   googleAuth() {
     return this.authLogin(new auth.GoogleAuthProvider());
   }
-  
+
   // AuthLogin for other various auth providers eg Facebook, Google.
   authLogin(provider) {
     provider.setCustomParameters({
-        'display': 'popup'
+      display: 'popup',
     });
-    return this.afAuth.signInWithPopup(provider)
-    .then((result) => {
+    return this.afAuth.signInWithPopup(provider).then((result) => {
       localStorage.setItem('user', JSON.stringify(result.user));
-
-      // Set user data if it is the first time the user is loggin in.
-      if(result.additionalUserInfo.isNewUser) {
-        this.userInstance2 = {
-          userId : result.user.uid,
-          name : "",
-          email: result.user.email,
-          language: ""
-        };
-        this.userDataSource.next(this.userInstance2);
-        console.log('userDataSource',this.$userSource);
-        this.router.navigate(['/select-language'])
-      }
-      // If not first time logging in, route to chat page.
-      else {
-        this.router.navigate(['/chat']);
-      }
-
+      return result;
     });
   }
 }
