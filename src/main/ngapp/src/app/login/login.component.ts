@@ -8,48 +8,66 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
-  
   loginAwait = false;
   error: any;
-  errorPresent: boolean = false;
+  errorPresent = false;
   constructor(public authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {}
 
   login(email: string, password: string): void {
     this.loginAwait = true;
-    this.authService.login(email, password).then((res: any) => {
+    this.authService
+      .login(email, password)
+      .then((res: any) => {
         localStorage.setItem('user', JSON.stringify(res.user));
         this.loginAwait = false;
         this.router.navigate(['/chat']);
-    })
-    .catch((error: any) => {
+      })
+      .catch((error: any) => {
         this.loginAwait = false;
         this.errorPresent = true;
         this.error = error.message;
-    });
+      });
   }
 
-  onClose(){
-      this.errorPresent = false;
+  onClose() {
+    this.errorPresent = false;
   }
 
   sendPasswordResetEmail(email: string) {
     this.authService.sendPasswordResetEmail(email);
   }
 
-  loginWithGoogle(){
-      this.authService.googleAuth().catch((error: any) => {
-        this.errorPresent = true;
-        this.error = error.message;
-    });
+  routerSplit(res: any) {
+    if (res.additionalUserInfo.isNewUser) {
+      this.router.navigate(['/select-language']);
+    } else {
+      this.router.navigate(['/chat']);
+    }
   }
 
-  loginWithFacebook(){
-      this.authService.googleAuth().catch((error: any) => {
+  loginWithGoogle() {
+    this.authService
+      .googleAuth()
+      .then((res) => {
+        this.routerSplit(res);
+      })
+      .catch((error: any) => {
         this.errorPresent = true;
         this.error = error.message;
-    });
+      });
   }
 
+  loginWithFacebook() {
+    this.authService
+      .facebookAuth()
+      .then((res) => {
+        this.routerSplit(res);
+      })
+      .catch((error: any) => {
+        this.errorPresent = true;
+        this.error = error.message;
+      });
+  }
 }
