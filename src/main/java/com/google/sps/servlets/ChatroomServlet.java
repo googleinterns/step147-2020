@@ -14,6 +14,11 @@
 
 package com.google.sps.servlets;
 
+import java.util.Arrays;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -36,148 +41,35 @@ import org.apache.commons.io.IOUtils;
 import com.google.sps.servlets.Message;
 import com.google.sps.servlets.Post;
 import com.google.sps.servlets.Chatroom;
-import com.pusher.rest.Pusher;
+
 
 /** Servlet that holds the chatrooms active on this WebApp */
-@WebServlet("/chatroom")
+@WebServlet("/chatrooms")
 public class ChatroomServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String userID = request.getParameter("userId");
-        String recipientID = request.getParameter("recipientId"); // the user whose chat was clicked
-        String chatroomID = "null";
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
         Query chatroomQuery = new Query("chatroom");
-        PreparedQuery chatrooms = datastore.prepare(chatroomQuery);
+        chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(
+                new FilterPredicate("user1", FilterOperator.EQUAL, userID),
+                new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
 
+        PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
+        
+        ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
         for (Entity chatroom : chatrooms.asIterable()) {
-            String chatroomId = (String) chatroom.getProperty("chatroomId");
-            String user1 = (String) chatroom.getProperty("user1");
-            String user2 = (String) chatroom.getProperty("user2");
-
-            Chatroom currChatRoom = new Chatroom(chatroomId, user1, user2);
-            List<String> usersList = currChatRoom.getUsers();
-
-            if ((usersList.contains(userID)) && (usersList.contains(recipientID))) {
-                    chatroomID = currChatRoom.getId();
-                    break;
-            }
-        }
-
-        // Check to see if chatroom is empty and make new chatroom
-        if (chatroomID == "null") {
-            Entity newChatroom = new Entity("chatroom");
-            chatroomID = UUID.randomUUID().toString();
-            newChatroom.setProperty("chatroomId", chatroomID);
-            newChatroom.setProperty("user1", userID);
-            newChatroom.setProperty("user2", recipientID);
-            datastore.put(newChatroom);
-        }
-
-        // go through messages and grabs the messages with chatroomID = to the chatroomID passed in
-        // then sorts them by timestamp
-        Query messageQuery = new Query("message").addSort("timestamp", SortDirection.ASCENDING);
-        PreparedQuery results = datastore.prepare(messageQuery);
-
-        ArrayList<Message> messagesInChatroom = new ArrayList<Message>();
-
-        for (Entity message : results.asIterable()) {
-            String messageId = (String) message.getProperty("messageId");
-            String chatroomId = (String) message.getProperty("chatroomId");
-            String text = (String) message.getProperty("text");
-            String translatedText = (String) message.getProperty("translatedText");
-            String senderId = (String) message.getProperty("senderId");
-            String recipientId = (String) message.getProperty("recipientId");
-            Long timestamp = (Long) message.getProperty("timestamp");
-
-            Message messageInstance = new Message(messageId, chatroomId, text, translatedText, senderId, recipientId, timestamp);
-            System.out.println(chatroomId);
-            System.out.println(chatroomID);
-            if(chatroomId.equals(chatroomID)){
-                messagesInChatroom.add(messageInstance);
-                System.out.println(messagesInChatroom);
-            }
+            Chatroom currChatRoom = new Chatroom(chatroom);
+            chatroomsList.add(currChatRoom);
         }
 
         Gson gson = new Gson();
     
-        response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println(gson.toJson(messagesInChatroom));
+        response.getWriter().println(gson.toJson(chatroomsList));
     }
-
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        
-        String jsonString = IOUtils.toString(request.getInputStream());
-        Post newPost = new Gson().fromJson(jsonString, Post.class);
-        
-        System.out.println(newPost);
-
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        String chatroomID = "";
-        Query chatroomQuery = new Query("chatroom");
-        PreparedQuery chatrooms = datastore.prepare(chatroomQuery);
-
-        // Query and retrieve the chatroom for the users.
-        for (Entity chatroom : chatrooms.asIterable()) {
-            String chatroomId = (String) chatroom.getProperty("chatroomId");
-            String user1 = (String) chatroom.getProperty("user1");
-            String user2 = (String) chatroom.getProperty("user2");
-
-            Chatroom currChatRoom = new Chatroom(chatroomId, user1, user2);
-            List<String> usersList = currChatRoom.getUsers();
-
-            if (usersList.contains(newPost.senderId) && usersList.contains(newPost.recipientId)) {
-                    chatroomID = currChatRoom.getId();
-                    break;
-            }
-        }
-
-        // Query the user and retrieve the language of the recipient.
-        Query userQuery = new Query("user");
-        PreparedQuery users = datastore.prepare(userQuery);
-        String lang = "";
-        for (Entity user: users.asIterable()){
-            System.out.println("Getting language");
-            String userLang = (String) user.getProperty("userId");
-            if( userLang.equals(newPost.recipientId)){
-                lang = (String) user.getProperty("language");
-                break;
-            }
-        }
-
-        // Translate the text.
-        Translate translate = TranslateOptions.getDefaultInstance().getService();
-        Translation translation = translate.translate(newPost.text, Translate.TranslateOption.targetLanguage(lang));
-        String translatedText = translation.getTranslatedText();
-
-        Entity newMessage = new Entity("message");
-        String messageUUID = UUID.randomUUID().toString();
-        newMessage.setProperty("messageId", messageUUID);
-        newMessage.setProperty("chatroomId", chatroomID);
-        newMessage.setProperty("text", newPost.text);
-        newMessage.setProperty("translatedText", translatedText);
-        newMessage.setProperty("senderId", newPost.senderId);
-        newMessage.setProperty("recipientId", newPost.recipientId);
-        newMessage.setProperty("timestamp", System.currentTimeMillis());
-        datastore.put(newMessage);
-
-        //Push the message
-        Pusher pusher = new Pusher("1036570", "fb37d27cdd9c1d5efb8d", "9698b690db9bed0b0ef7");
-        pusher.setCluster("us2");
-        pusher.setEncrypted(true);
-
-        // New message instance
-        Message messageInstance = new Message(messageUUID, chatroomID, newPost.text, translatedText, newPost.senderId, newPost.recipientId, System.currentTimeMillis());
-        Gson gson = new Gson();
-
-        System.out.println("Pusher triggered");
-        pusher.trigger(chatroomID, "new-message", gson.toJson(messageInstance));
-
-    }
-
 }

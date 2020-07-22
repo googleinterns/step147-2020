@@ -1,4 +1,4 @@
-<div *ngIf="users">
+<!-- <div *ngIf="users">
     <div class="channels" *ngFor="let user of users">
         <div class="chat_list" *ngIf="user.userId != currId">
             <div class="chat_people"  (click)="onSelect(user.userId)">
@@ -8,4 +8,13 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
+
+<nb-card>
+    <nb-list>
+        <nb-list-item *ngFor="let user of users" (click)="onSelect(user)">
+            <nb-user [name]="user.name">
+            </nb-user>
+        </nb-list-item>
+    </nb-list>
+</nb-card>

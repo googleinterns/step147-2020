@@ -1,5 +1,3 @@
-declare const Pusher: any;
-
 import { Injectable } from '@angular/core';
 import { Message } from './models/message';
 import { Chatroom } from './models/chatroom';
@@ -15,64 +13,55 @@ import { environment } from './../environments/environment';
   providedIn: 'root',
 })
 export class ChatDataService {
-  pusher: any;
-  channel: any;
 
-  requestChannel: string = "";
+  constructor(private authService: AuthService, private http: HttpClient ) {} 
 
-  constructor(private authService: AuthService, private http: HttpClient ) {
-    this.pusher = new Pusher(environment.pusher.key, {
-        cluster: environment.pusher.cluster,
-        encrypted: true
-    });
-  }
-
-  // Get the object associated with the currrent user.
+  // Get the object associated with the currrent user. 
   getUser(): Observable<User[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
-    console.log("UserId: ", localUser.uid);
-    console.log("Found local user in storage: ", localUser.uid);
     return this.http.get<User[]>("/user?userId="+localUser.uid);
   }
 
   // Create a new user object for the user.
-  addUser(user: User): void{
-      this.http.post("/user", user);
+  addUser(user: User): Observable<any> {
+    return this.http.post("/user", user);
   }
 
+  // Get a list of all the users in our service.
   getUsers(): Observable<User[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
     return this.http.get<User[]>("/users?userId="+localUser.uid);
   }
 
-  getMessages(recipient: string): Observable<Message[]> {
+  // Get messages between two users.
+  getMessages(id: string): Observable<Message[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
-    let url: string = "/chatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
+    const url: string = "/messages?chatroomId=" + id;
     return this.http.get<Message[]>(url);
   }
 
-  getChatroom(recipient: string): string {
-    let chat: string = "";
+  // Get a chatroom for a recepient;
+  getChatroom(recipient: string): Observable<Chatroom[]> {
     var localUser = JSON.parse(localStorage.getItem("user"));
-    let url: string = "/getChatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
-    
-    const promise = this.http.get<Chatroom>(url).toPromise();
-    promise.then(res => {
-        console.log("Chatroom Id: ", res[0].chatroomId);
-        this.requestChannel = res[0].chatroomId;
-        chat = this.requestChannel;
-        this.channel = this.pusher.subscribe(this.requestChannel);
-    }).catch(err => console.error(err));
+    const url: string = "/getChatroom?userId=" + localUser.uid + "&recipientId=" + recipient;
+    return this.http.get<Chatroom[]>(url);
+  }
 
-    return chat;
+  // Get all chatrooms.
+  getChatrooms(): Observable<Chatroom[]> {
+      var localUser = JSON.parse(localStorage.getItem("user"));
+      const url: string = "/chatrooms?userId=" + localUser.uid;
+        return this.http.get<Chatroom[]>(url);
   }
  
+  // Add message in a new chatroom.
   addMessage(input: Post){
-    console.log("about to send post", input);
-    const promise = this.http.post<Post>("/chatroom", input).toPromise();
-    promise.then(res => console.log("Res: ", res)).catch(err => console.error(err));
+    const promise = this.http.post<Post>("/messages", input).toPromise();
+    promise.catch(err => console.error("Error sending new message: ", err));
+
   }
  
+  // Logout of the service.
   logout(){
     this.authService.logout();
   }

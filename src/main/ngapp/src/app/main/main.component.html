@@ -8,28 +8,38 @@
       <div class="inbox_msg">
         <div class="inbox_people">
           <div class="headind_srch input-group">
-            <input
-              type="text"
-              class="form-control shadow-sm search-bar"
-              placeholder="Search by @username"
-            />
+            <ng-autocomplete 
+            [data]="users"
+            [searchKeyword]="keyword"
+            (selected)='selectUser($event)'
+            [itemTemplate]="itemTemplate"
+            >
+
+            </ng-autocomplete>
+            
+            <ng-template #itemTemplate let-item>
+            <a [innerHTML]="item.name"></a>
+            </ng-template>
           </div>
 
-          <div class="inbox_chat" *ngIf="users">
+          <div  *ngIf="chatroomUsers">
             <app-chat-bar
-              [users]="users"
+              [users]="chatroomUsers"
+              [chatrooms]="chatrooms"
               (changeChat)="onChange($event)"
             ></app-chat-bar>
           </div>
         </div>
-        <div *ngIf="messages">
-            <app-chat-section 
-            class="mesgs"
-            [messages]="messages"
-            (emitMessage)="onNewMessage($event)"
-            ></app-chat-section>
-        </div>
+        <app-chat-section 
+        class="mesgs"
+        [messages]="messages"
+        [selectedUser]="selectedUser"
+        (emitMessage)="onNewMessage($event)"
+        ></app-chat-section>
       </div>
+      <button [routerLink]="'/change-user-info'" class="btn btn-primary">
+            Change Your Language / Name
+      </button>
     </div>
   </div>
 </div>

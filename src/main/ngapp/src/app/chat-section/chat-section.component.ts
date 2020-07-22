@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Message } from '../models/message';
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-chat-section',
@@ -11,24 +12,26 @@ export class ChatSectionComponent implements OnInit {
 
   @Output() emitMessage : EventEmitter<String> = new EventEmitter();
   @Input() messages : Message[];
+  @Input() selectedUser : User;
   
   currId: string;
   newMessage = '';
+  title = "Username";
 
   constructor() { }
 
   ngOnInit(){
-      const localUser = JSON.parse(localStorage.getItem("user"));
-      this.currId = localUser.uid;
-      console.log("Chat section uid: ", this.currId);
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    this.currId = localUser.uid;
   }
 
-  sendMessage(){
+  sendMessage(event){
+
     if(this.newMessage.trim() === ''){
         return;
     }
-    console.log(this.newMessage);
-    this.emitMessage.emit(this.newMessage);
+ 
+    this.emitMessage.emit(event.message);
     this.newMessage = '';
   }
 

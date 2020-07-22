@@ -2,6 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { AutocompleteLibModule} from 'angular-ng-autocomplete';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
@@ -9,11 +11,31 @@ import { AppComponent } from './app.component';
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 
+import { ChangeUserInfoComponent } from './change-user-info/change-user-info.component';
 import { ChatBarComponent } from './chat-bar/chat-bar.component';
 import { ChatSectionComponent } from './chat-section/chat-section.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MainComponent } from './main/main.component';
+import { ConfirmEqualValidatorDirective } from './auth/confirm-equal-validator.directive';
+import { SelectLanguageComponent } from './select-language/select-language.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
+import {
+  NbThemeModule,
+  NbLayoutModule,
+  NbCardModule,
+  NbSearchModule,
+  NbUserModule,
+  NbListModule,
+  NbChatModule,
+  NbSpinnerModule,
+  NbInputModule,
+  NbButtonModule,
+  NbAlertModule,
+  NbIconModule,
+  NbSelectModule,
+} from '@nebular/theme';
 
 // My web app's Firebase configuration.
 const firebaseConfig = {
@@ -24,7 +46,7 @@ const firebaseConfig = {
   storageBucket: "team147-step2020.appspot.com",
   messagingSenderId: "656351090386",
   appId: "1:656351090386:web:92adc8b6ca7ef1393aff0b",
-  measurementId: "G-25QMK9RGPP",
+  measurementId: "G-25QMK9RGPP"
 };
 
 @NgModule({
@@ -35,6 +57,9 @@ const firebaseConfig = {
     LoginComponent,
     RegisterComponent,
     MainComponent,
+    ConfirmEqualValidatorDirective,
+    ChangeUserInfoComponent,
+    SelectLanguageComponent
   ],
   imports: [
     BrowserModule,
@@ -43,9 +68,27 @@ const firebaseConfig = {
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireAuthModule,
     RouterModule,
-    HttpClientModule
+    HttpClientModule,
+    AutocompleteLibModule,
+    BrowserAnimationsModule,
+    NbThemeModule.forRoot({ name: 'default' }),
+    NbLayoutModule,
+    NbEvaIconsModule,
+    NbCardModule,
+    NbSearchModule,
+    NbUserModule,
+    NbListModule,
+    NbChatModule,
+    NbSpinnerModule,
+    NbInputModule,
+    NbButtonModule,
+    NbAlertModule,
+    NbIconModule,
+    NbSelectModule,
   ],
-  providers: [],
+  providers: [
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
