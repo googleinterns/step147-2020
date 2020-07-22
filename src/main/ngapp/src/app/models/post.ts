@@ -1,6 +1,6 @@
-export interface Post{
-    senderId: string;
-    recipientId: string;
-    text: string;
-    chatroomId: string;
+export interface Post {
+  senderId: string;
+  recipientId: string;
+  text: string;
+  chatroomId: string;
 }

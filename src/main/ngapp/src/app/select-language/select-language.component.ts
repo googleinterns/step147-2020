@@ -1,38 +1,36 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../auth/auth.service';
+import { ChatDataService } from '../chat-data.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { User as LocalUser } from '../models/user';
-
+import { User } from '../models/user';
 
 @Component({
   selector: 'app-select-language',
   templateUrl: './select-language.component.html',
-  styleUrls: ['./select-language.component.css']
+  styleUrls: ['./select-language.component.css'],
 })
 export class SelectLanguageComponent implements OnInit {
+  constructor(public chatService: ChatDataService, private router: Router) {}
 
-  user: LocalUser;
+  ngOnInit(): void {}
 
-  constructor(public authService: AuthService, private router: Router, private http: HttpClient) { }
+  signUp(nameInput: string, languageInput: string) {
+    const localUser = JSON.parse(localStorage.getItem('user'));
+    let userInstance: User = {
+      userId: localUser.uid,
+      name: nameInput,
+      email: localUser.email,
+      language: languageInput,
+    };
 
-  ngOnInit(): void {
+    const addUserPromise = this.chatService.addUser(userInstance).toPromise();
 
-    // Receives data from BehaviorSubject observable that shares data from authService.
-    this.authService.$userSource.subscribe(user => this.user = user);
-
-  }
-  // POSTs the new User to database and navigates to the chat window.
-  addToDb(frm): void {
-    this.user.name = frm.value.name;
-    this.user.language = frm.value.language;
-    console.log(this.user);
-    
-    // POST to database.
-    const promise = this.http.post<LocalUser>("/user", this.user).toPromise();
-    promise.then(response => {
-      console.log("User post request: ", response);
-      this.router.navigate(['/chat']);
-    });
+    addUserPromise
+      .then((res) => {
+        this.router.navigate(['/chat']);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 }
