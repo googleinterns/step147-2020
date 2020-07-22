@@ -1,4 +1,4 @@
-<div class="alignment">
+<!-- <div class="alignment">
 <div class="row mt-4">
     <form #languageForm="ngForm" (ngSubmit)="addToDb(languageForm)">
 
@@ -27,11 +27,85 @@
 
           <div class="col-md-12">
             <button class="btn btn-primary" type="submit" [disabled]="!languageForm.valid">Submit</button>
-            
+
           </div>
 
       </div>
 
     </form>
 </div>
-</div>
+</div> -->
+
+<nb-card>
+  <nb-card-header>
+    Almost there!
+  </nb-card-header>
+  <nb-card-body>
+    <nb-stepper #stepper>
+      <nb-step [stepControl]="nameForm" label="Name">
+        <form #nameForm="ngForm" class="step-container">
+          <div class="input-group">
+            <input
+              type="text"
+              placeholder="Enter your preferred name"
+              name="name"
+              required
+              nbInput
+              ngModel
+              #name="ngModel"
+              [status]="name.invalid ? 'danger' : 'basic'"
+            />
+          </div>
+          <button
+            nbButton
+            nbStepperNext
+            [disabled]="name.invalid"
+            [status]="name.invalid ? 'basic' : 'primary'"
+          >
+            next
+          </button>
+        </form>
+      </nb-step>
+
+      <nb-step [stepControl]="languageForm" label="Movie">
+        <form #languageForm="ngForm" class="step-container">
+          <div class="input-group">
+            <nb-select
+              placeholder="Select Showcase"
+              ngModel
+              #language="ngModel"
+              name="language"
+              id="language"
+              required
+              [status]="
+                language.dirty
+                  ? language.invalid
+                    ? 'danger'
+                    : 'success'
+                  : 'basic'
+              "
+            >
+              <nb-option value="en">English</nb-option>
+              <nb-option value="fr">French</nb-option>
+              <nb-option value="sp">Spanish</nb-option>
+              <nb-option value="it">Italian</nb-option>
+              <nb-option value="sw"> Swahili </nb-option>
+              <nb-option value="zh">Chinese</nb-option>
+              <nb-option value="ar">Arabic </nb-option>
+              <nb-option value="de">German </nb-option>
+            </nb-select>
+          </div>
+          <button
+            nbButton
+            nbStepperNext
+            [disabled]="language.invalid"
+            [status]="language.invalid ? 'basic' : 'primary'"
+            (click)="signUp(name.value, language.value)"
+          >
+            complete
+          </button>
+        </form>
+      </nb-step>
+    </nb-stepper>
+  </nb-card-body>
+</nb-card>
