@@ -1,26 +1,13 @@
-<nb-chat [title]="selectedUser.name">
-    <div *ngFor="let message of messages">
-        <div  
-            *ngIf="
-                message.senderId !== currId;
-                then incoming_msg;
-                else outgoing_msg
-        "></div>
-        <ng-template #incoming_msg>
-            <nb-chat-message 
-                   [message]="message.translatedText"
-                   [reply]="'true'"
-                   [date]="message.date" >
-            </nb-chat-message>
-        </ng-template>
-        <ng-template #outgoing_msg>
-                <nb-chat-message *ngFor="let message of messages"
-                    [message]="message.text"
-                    [reply]="'false'"
-                    [date]="message.timestamp" >
-                </nb-chat-message>
-        </ng-template>
-    </div>
-    
+<nb-chat [title]="selectedUser.name | titlecase">
+  <nb-chat-message
+    *ngFor="let message of messages"
+    [message]="
+      message.senderId !== currId ? message.translatedText : message.text
+    "
+    [reply]="message.senderId !== currId ? false : true"
+    [date]="message.timestamp | date: 'shortTime'"
+  >
+  </nb-chat-message>
+
   <nb-chat-form (send)="sendMessage($event)"></nb-chat-form>
 </nb-chat>

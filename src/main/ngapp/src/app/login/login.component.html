@@ -1,110 +1,77 @@
-<!-- <div class="container pt-3">
-  <div class="row justify-content-sm-center">
-    <div class="col-sm-10 col-md-6">
-      <div class="card border-info">
-        <div class="card-header">Login</div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-4 text-center">
-              <img src="https://placeimg.com/128/128/nature" />
-            </div>
-            <div class="col-md-8">
-              <form>
-                <input
-                  type="email"
-                  name="email"
-                  class="form-control mb-2"
-                  placeholder="Email"
-                  #userEmail
-                  required
-                  autofocus
-                />
-
-                <input
-                  type="password"
-                  class="form-control mb-2"
-                  placeholder="Password"
-                  #userPW
-                  required
-                />
-
-                <button
-                  class="btn btn-lg btn-primary btn-block mb-1"
-                  type="submit"
-                  (click)="login(userEmail.value, userPW.value)"
-                >
-                  Login
-                </button>
-
-                <p>
-                    Don't have an account?
-                    <a [routerLink]="['/register']"> Sign up here </a>
-                </p>
-    
-                <p>
-                    <button
-                        type="button"
-                        class="btn btn-block"
-                        type="submit"
-                        (click)="sendPasswordResetEmail(userEmail.value)"
-                    >
-                    <a href="">Reset Password</a>
-                    </button>
-                </p>
-
-                <button type="button" 
-                    mdbBtn color="fb" 
-                    class="waves-light" 
-                    (click)="authService.facebookAuth()"
-                    mdbWavesEffect>
-                    <i class="fab fa-facebook-f left"></i>
-                        Facebook Login
-                </button>
-
-                <button type="button" 
-                    mdbBtn color="fb" 
-                    class="waves-light" 
-                    (click)="authService.googleAuth()"
-                    mdbWavesEffect>
-                    <i class="fab fa-google"></i>
-                        Google Login
-                </button>
-
-              </form>
-            
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 <nb-card [nbSpinner]="loginAwait" nbSpinnerStatus="primary">
   <nb-card-header>Login</nb-card-header>
   <nb-card-body>
-      <nb-alert status="danger" closable (close)="onClose()" *ngIf="errorPresent">
-        {{ error }}
-      </nb-alert>
-      <form #nameForm="ngForm">
-        <input nbInput type="email" name="email" email ngModel #userEmail="ngModel" fullWidth placeholder="Email" required >
-        <input nbInput type="password" name="password" id="password" ngModel #userPW="ngModel" minlength="6" fullWidth placeholder="Password" required>
-        <button nbButton fullWidth class="login_button" status="primary" [disabled]="nameForm.invalid" type="submit" (click)="login(userEmail.value, userPW.value)">Login</button>
-      </form>
-    <div class="register_link">Don't have an account? <a [routerLink]="['/register']">Sign up here</a></div>
-    <br/>
+    <nb-alert status="danger" closable (close)="onClose()" *ngIf="errorPresent">
+      {{ error }}
+    </nb-alert>
+    <form #nameForm="ngForm">
+      <input
+        nbInput
+        type="email"
+        name="email"
+        email
+        ngModel
+        #userEmail="ngModel"
+        fullWidth
+        placeholder="Email"
+        required
+      />
+      <input
+        nbInput
+        type="password"
+        name="password"
+        id="password"
+        ngModel
+        #userPW="ngModel"
+        minlength="6"
+        fullWidth
+        placeholder="Password"
+        required
+      />
+      <button
+        nbButton
+        fullWidth
+        class="login_button"
+        status="primary"
+        [disabled]="nameForm.invalid"
+        type="submit"
+        (click)="login(userEmail.value, userPW.value)"
+      >
+        Login
+      </button>
+    </form>
+    <div class="register_link">
+      Don't have an account? <a [routerLink]="['/register']">Sign up here</a>
+    </div>
+    <br />
     <div class="divider"><p>OR</p></div>
-    <br/>
+    <br />
 
-    <button id="google" nbButton fullWidth class="social_button" (click)="loginWithFacebook()" >
-        <img width="23px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" class="icon" /> 
-        Login with Google 
+    <button
+      id="google"
+      nbButton
+      fullWidth
+      class="social_button"
+      (click)="loginWithGoogle()"
+    >
+      <img
+        width="23px"
+        alt="Google sign-in"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
+        class="icon"
+      />
+      Login with Google
     </button>
 
-    <button id="facebook" nbButton fullWidth class="social_button" (click)="loginWithGoogle()" >
-        <i class="fa fa-facebook-square fa-2x icon" aria-hidden="true"></i>
-        Login with Facebook 
+    <button
+      id="facebook"
+      nbButton
+      fullWidth
+      class="social_button"
+      (click)="loginWithFacebook()"
+    >
+      <i class="fa fa-facebook-square fa-2x icon" aria-hidden="true"></i>
+      Login with Facebook
     </button>
-
   </nb-card-body>
 </nb-card>
