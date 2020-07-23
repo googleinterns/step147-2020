@@ -113,12 +113,13 @@ public class UserServlet extends HttpServlet {
         User userInput = new Gson().fromJson(jsonString, User.class);
         String userID = userInput.userId;
 
-        // Create key from userId
-        Key userIdKey = KeyFactory.createKey("user", userID);
-        Entity user = datastore.get(userIdKey);
-
         // Update user using userId as entity identifier.
-        user.setProperty("language", userInput.language);
-        database.put(user);
+        Entity userToUpdate = new Entity("user", userID);
+        userToUpdate.setProperty("userId", userInput.userId);
+        userToUpdate.setProperty("name", userInput.name);
+        userToUpdate.setProperty("email", userInput.email);
+        userToUpdate.setProperty("language", userInput.language);
+
+        database.put(userToUpdate);
     }
 }
