@@ -36,26 +36,27 @@ import com.google.sps.servlets.User;
 public class UsersServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String userID = request.getParameter("userId");
-        Query query = new Query("user");
-        PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
+        
+        String userID = request.getHeader("userId");
 
-        ArrayList<User> users = new ArrayList<User>();
+        if (userID == null) {
+            response.sendError(500);
+        } else {
+            Query query = new Query("user");
+            PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
 
-        for (Entity user : results.asIterable()) {
-            // String userId = (String) user.getProperty("userId");
-            // String name = (String) user.getProperty("name");
-            // String email = (String) user.getProperty("email");
-            // String language = (String) user.getProperty("language");
+            ArrayList<User> users = new ArrayList<User>();
 
-            User userInstance = new User(user);
-            if (!(userInstance.userId.equals(userID))){
-                users.add(userInstance);
+            for (Entity user : results.asIterable()) {
+                User userInstance = new User(user);
+                if (!(userInstance.userId.equals(userID))){
+                    users.add(userInstance);
+                }
             }
-        }
-        Gson gson = new Gson();
+            Gson gson = new Gson();
 
-        response.setContentType("application.json");
-        response.getWriter().println(gson.toJson(users));
+            response.setContentType("application.json");
+            response.getWriter().println(gson.toJson(users));
+        }
     }
 }
