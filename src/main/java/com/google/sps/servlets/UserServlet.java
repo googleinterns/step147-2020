@@ -114,18 +114,20 @@ public class UserServlet extends HttpServlet {
         database.put(newUser);
     }
 
-    // @Override
-    // public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, EntityNotFoundException {
-    //     String jsonString = IOUtils.toString((request.getInputStream()));
-    //     User userInput = new Gson().fromJson(jsonString, User.class);
-    //     String userID = userInput.userId;
+    @Override
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, EntityNotFoundException {
+         String jsonString = IOUtils.toString((request.getInputStream()));
+         User userInput = new Gson().fromJson(jsonString, User.class);
+         String userID = userInput.userId;
 
-    //     // Create key from userId
-    //     Key userIdKey = KeyFactory.createKey("user", userID);
-    //     Entity user = database.get(userIdKey);
+        // Update user using userId as entity identifier.
+        Entity userToUpdate = new Entity("user", userID);
+        userToUpdate.setProperty("userId", userInput.userId);
+        userToUpdate.setProperty("name", userInput.name);
+        userToUpdate.setProperty("email", userInput.email);
+        userToUpdate.setProperty("language", userInput.language);
 
-    //     // Update user using userId as entity identifier.
-    //     user.setProperty("language", userInput.language);
-    //     database.put(user);
-    // }
+        database.put(userToUpdate);
+    }
+
 }
