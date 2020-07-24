@@ -29,8 +29,6 @@ import com.google.cloud.datastore.DatastoreException;
 import com.google.cloud.datastore.EntityQuery;
 import com.google.cloud.datastore.FullEntity;
 import com.google.cloud.datastore.IncompleteKey;
-//import com.google.cloud.datastore.Key;
-//import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.ListValue;
 import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.ProjectionEntity;
@@ -115,10 +113,10 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException, EntityNotFoundException {
-         String jsonString = IOUtils.toString((request.getInputStream()));
-         User userInput = new Gson().fromJson(jsonString, User.class);
-         String userID = userInput.userId;
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String jsonString = IOUtils.toString((request.getInputStream()));
+        User userInput = new Gson().fromJson(jsonString, User.class);
+        String userID = userInput.userId;
 
         // Update user using userId as entity identifier.
         Entity userToUpdate = new Entity("user", userID);
