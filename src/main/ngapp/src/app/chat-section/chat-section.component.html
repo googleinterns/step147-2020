@@ -5,7 +5,14 @@
       message.senderId !== currId ? message.translatedText : message.text
     "
     [reply]="message.senderId !== currId ? false : true"
-    [date]="message.timestamp | date: 'shortTime'"
+    [date]="message.timestamp"
+  >
+  </nb-chat-message>
+
+  <nb-chat-message
+    *ngIf = "messageInTransit"
+    [message]="'sending...'"
+    [reply]="true"
   >
   </nb-chat-message>
 

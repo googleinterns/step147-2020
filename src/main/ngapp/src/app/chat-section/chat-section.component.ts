@@ -11,6 +11,7 @@ export class ChatSectionComponent implements OnInit {
   @Output() emitMessage: EventEmitter<String> = new EventEmitter();
   @Input() messages: Message[];
   @Input() selectedUser: User;
+  @Input() messageInTransit: boolean;
 
   currId: string;
 

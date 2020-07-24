@@ -7,7 +7,7 @@
 
 .inbox_people {
   float: left;
-  width: 35%;
+  width: 30%;
   height: 80vh;
   border-right: 1px solid #c4c4c4;
 }
@@ -27,7 +27,7 @@
 .mesgs {
   float: left;
   height: 80vh;
-  width: 65%;
+  width: 70%;
 }
 
 .inbox_chat {
