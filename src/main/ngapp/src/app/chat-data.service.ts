@@ -16,9 +16,9 @@ export class ChatDataService {
   constructor(private authService: AuthService, private http: HttpClient) {}
 
   // Get the object associated with the currrent user.
-  getUser(): Observable<User[]> {
+  getUser(): Observable<User> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-    return this.http.get<User[]>('/user?userId=' + localUser.uid);
+    return this.http.get<User>('/user?userId=' + localUser.uid);
   }
 
   // Create a new user object for the user.
@@ -26,6 +26,7 @@ export class ChatDataService {
     return this.http.post<User>('/user', user);
   }
 
+  //
   updateLanguage(user: User): Observable<any> {
     return this.http.put<User>('/user', user);
   }
@@ -59,9 +60,8 @@ export class ChatDataService {
   }
 
   // Add message in a new chatroom.
-  addMessage(input: Post) {
-    const promise = this.http.post<Post>('/messages', input).toPromise();
-    promise.catch((err) => console.error('Error sending new message: ', err));
+  addMessage(input: Post): Observable<any> {
+    return this.http.post<Post>('/messages', input);
   }
 
   // Logout of the service.

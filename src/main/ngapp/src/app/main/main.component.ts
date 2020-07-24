@@ -34,6 +34,14 @@ export class MainComponent implements OnInit {
   // Variables to update spinners.
   chatBarLoading = false;
   chatSectionLoading = false;
+  sendingMessage = false;
+
+  // Update language alert.
+  languageUpdateLoading = false;
+  languageUpdateSuccess = false;
+  languageUpdateFailure = false;
+  languageUpdateError : string;
+
 
   // Menu items.
   menuItems = [{ title: 'Settings' }, { title: 'Logout' }];
@@ -41,7 +49,6 @@ export class MainComponent implements OnInit {
   // Autocomplete options.
   filteredUsers$: Observable<User[]>;
   @ViewChild('autoInput') input;
-
   @ViewChild('dialog') dialogRef: TemplateRef<any>;
 
   constructor(
@@ -52,6 +59,22 @@ export class MainComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    
+    // Subscribe to changes in the menu.
+    this.nbMenuService
+      .onItemClick()
+      .pipe(
+        filter(({ tag }) => tag === 'my-context-menu'),
+        map(({ item: { title } }) => title)
+      )
+      .subscribe((title) => {
+        if (title === 'Logout') {
+          this.logout();
+        } else if (title === 'Settings') {
+          this.openDialogService(this.dialogRef);
+        }
+      });
+    
     // Retrieve data on first load
     this.chatBarLoading = true;
     const localUser = JSON.parse(localStorage.getItem('user'));
@@ -69,21 +92,6 @@ export class MainComponent implements OnInit {
         this.chatBarLoading = false;
       });
     });
-
-    // Subscribe to changes in the menu.
-    this.nbMenuService
-      .onItemClick()
-      .pipe(
-        filter(({ tag }) => tag === 'my-context-menu'),
-        map(({ item: { title } }) => title)
-      )
-      .subscribe((title) => {
-        if (title === 'Logout') {
-          this.logout();
-        } else if (title === 'Settings') {
-          this.openDialogService(this.dialogRef);
-        }
-      });
   }
 
   // Filter to check which users have been selected.
@@ -119,21 +127,42 @@ export class MainComponent implements OnInit {
 
   // Function to make a http call to update the user's preferred language
   updateLanguage(selectedLanguage: string) {
-    const localUser: User = {
-      userId: this.currId,
-      name: '',
-      email: '',
-      language: selectedLanguage,
-    };
+    this.languageUpdateLoading = true;
+    const fetchUserPromise = this.chatService.getUser().toPromise();
+    fetchUserPromise.then(user => {
+        let returnedUser = user;
 
-    const putRequest = this.chatService.updateLanguage(localUser).toPromise();
-    putRequest
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
+        const localUser: User = {
+            userId: this.currId,
+            name: returnedUser.name,
+            email: returnedUser.email,
+            language: selectedLanguage,
+        };
+
+        const putRequest = this.chatService.updateLanguage(localUser).toPromise();
+        putRequest.then((res) => {
+            this.languageUpdateLoading = false;
+            this.languageUpdateSuccess = true;
+            console.log(res);
+        })
+        .catch((err) => {
+            this.languageUpdateLoading = false;
+            this.languageUpdateError = err;
+            this.languageUpdateFailure = true;
+            console.error(err);
+        });
+    }).catch(err => {
+        this.languageUpdateLoading = false;
+        this.languageUpdateError = err;
+        this.languageUpdateFailure = true;
         console.error(err);
-      });
+    });
+    
+  }
+
+  closeAlert(){
+      this.languageUpdateSuccess = false;
+      this.languageUpdateFailure = false;
   }
 
   // Helper function to determine whether a user is in any of the chatrooms.
@@ -176,6 +205,7 @@ export class MainComponent implements OnInit {
 
   // Function that handles switching data and messages depending on who is selected.
   onChange(user: User) {
+    this.chatSectionLoading = true;
     this.pusher.unsubscribePusher();
     this.selectedUser = user;
     // this.currentRecipient = user.userId;
@@ -196,6 +226,7 @@ export class MainComponent implements OnInit {
         const messagePromise = this.fetchMessages(chatroomId);
         messagePromise
           .then((messages) => {
+            this.chatSectionLoading = true;
             console.log(messages);
           })
           .catch((err) => {
@@ -208,9 +239,11 @@ export class MainComponent implements OnInit {
       const messagePromise = this.fetchMessages(chatroomId);
       messagePromise
         .then((messages) => {
+          this.chatSectionLoading = true;
           console.log(messages);
         })
         .catch((err) => {
+          this.chatSectionLoading = true;
           console.error(err);
         });
     }
@@ -218,13 +251,21 @@ export class MainComponent implements OnInit {
 
   // Function to make a http call to send a new message to server.
   onNewMessage(newMessage: string) {
+    this.sendingMessage = true;
+
     const newPost: Post = {
       senderId: this.currId,
       recipientId: this.selectedUser.userId,
       text: newMessage,
       chatroomId: this.selectedChatroom.chatroomId,
     };
-    this.chatService.addMessage(newPost);
+    const sendMessagePromise = this.chatService.addMessage(newPost).toPromise();
+    sendMessagePromise.then(() => {
+        this.sendingMessage = false;
+    }).catch((err) => {
+        this.sendingMessage = false;
+        console.error(err);
+    })
   }
 
   // Function to log user out.
