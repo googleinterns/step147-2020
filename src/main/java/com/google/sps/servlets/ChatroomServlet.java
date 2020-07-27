@@ -54,22 +54,26 @@ public class ChatroomServlet extends HttpServlet {
 
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        Query chatroomQuery = new Query("chatroom");
-        chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(
-                new FilterPredicate("user1", FilterOperator.EQUAL, userID),
-                new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
+        if (userID == null) {
+            response.sendError(500);
+        } else {
+            Query chatroomQuery = new Query("chatroom");
+            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(
+                    new FilterPredicate("user1", FilterOperator.EQUAL, userID),
+                    new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
 
-        PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
+            PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
+            
+            ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
+            for (Entity chatroom : chatrooms.asIterable()) {
+                Chatroom currChatRoom = new Chatroom(chatroom);
+                chatroomsList.add(currChatRoom);
+            }
+
+            Gson gson = new Gson();
         
-        ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
-        for (Entity chatroom : chatrooms.asIterable()) {
-            Chatroom currChatRoom = new Chatroom(chatroom);
-            chatroomsList.add(currChatRoom);
+            response.setContentType("application/json");
+            response.getWriter().println(gson.toJson(chatroomsList));
         }
-
-        Gson gson = new Gson();
-    
-        response.setContentType("application/json");
-        response.getWriter().println(gson.toJson(chatroomsList));
     }
 }

@@ -49,35 +49,40 @@ public class GetChatroom extends HttpServlet {
 
         String userID = request.getParameter("userId");
         String recipientID = request.getParameter("recipientId"); // the user whose chat was clicked
-        String chatroomID = "null";
-
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-        Query chatroomQuery = new Query("chatroom");
-        chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(
-                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user1", FilterOperator.EQUAL, recipientID))),
-                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user2", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, recipientID)))
-            )));
-
         
-        Entity chatroom = datastore.prepare(chatroomQuery).asSingleEntity();
+        if (userID == null || recipientID == null) {
+            response.sendError(500);
+        } else {
+            String chatroomID = "null";
 
-        List<Chatroom> returnChatroom = new ArrayList<Chatroom>();
+            DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        if(chatroom == null){
-            Entity newChatroom = new Entity("chatroom");
-            chatroomID = UUID.randomUUID().toString();
-            newChatroom.setProperty("chatroomId", chatroomID);
-            newChatroom.setProperty("user1", userID);
-            newChatroom.setProperty("user2", recipientID);
-            datastore.put(newChatroom);
-            returnChatroom.add(new Chatroom(newChatroom));
-        }else {
-            returnChatroom.add(new Chatroom(chatroom));
+            Query chatroomQuery = new Query("chatroom");
+            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(
+                    new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user1", FilterOperator.EQUAL, recipientID))),
+                    new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user2", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, recipientID)))
+                )));
+
+            
+            Entity chatroom = datastore.prepare(chatroomQuery).asSingleEntity();
+
+            List<Chatroom> returnChatroom = new ArrayList<Chatroom>();
+
+            if(chatroom == null){
+                Entity newChatroom = new Entity("chatroom");
+                chatroomID = UUID.randomUUID().toString();
+                newChatroom.setProperty("chatroomId", chatroomID);
+                newChatroom.setProperty("user1", userID);
+                newChatroom.setProperty("user2", recipientID);
+                datastore.put(newChatroom);
+                returnChatroom.add(new Chatroom(newChatroom));
+            }else {
+                returnChatroom.add(new Chatroom(chatroom));
+            }
+
+            Gson gson = new Gson();
+            response.setContentType("application/json");
+            response.getWriter().println(gson.toJson(returnChatroom));
         }
-
-        Gson gson = new Gson();
-        response.setContentType("application/json");
-        response.getWriter().println(gson.toJson(returnChatroom));
     }
 }

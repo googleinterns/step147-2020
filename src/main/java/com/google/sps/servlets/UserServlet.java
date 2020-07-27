@@ -29,8 +29,6 @@ import com.google.cloud.datastore.DatastoreException;
 import com.google.cloud.datastore.EntityQuery;
 import com.google.cloud.datastore.FullEntity;
 import com.google.cloud.datastore.IncompleteKey;
-import com.google.cloud.datastore.Key;
-import com.google.cloud.datastore.KeyFactory;
 import com.google.cloud.datastore.ListValue;
 import com.google.cloud.datastore.PathElement;
 import com.google.cloud.datastore.ProjectionEntity;
@@ -63,6 +61,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import com.google.datastore.v1.Query.Builder;
 import com.google.sps.servlets.User;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 
 /** Servlet that holds the users on this WebApp */
 @WebServlet("/user")
@@ -74,21 +75,25 @@ public class UserServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String userID = request.getParameter("userId");
+        String userID = request.getHeader("userId");
 
-        Query query = new Query("user");
-        query.setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userID));
+        if (userID == null) {
+            response.sendError(500);
+        } else {
+            Query query = new Query("user");
+            query.setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userID));
 
-        Entity userEntity = database.prepare(query).asSingleEntity();
-        
-        User user = new User(userEntity);
-        PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
+            Entity userEntity = database.prepare(query).asSingleEntity();
+            
+            User user = new User(userEntity);
+            PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
 
 
-        Gson gson = new Gson();
+            Gson gson = new Gson();
 
-        response.setContentType("application/json");
-        response.getWriter().println(gson.toJson(user));
+            response.setContentType("application/json");
+            response.getWriter().println(gson.toJson(user));
+        }
     }
 
     @Override
@@ -112,13 +117,16 @@ public class UserServlet extends HttpServlet {
         String jsonString = IOUtils.toString((request.getInputStream()));
         User userInput = new Gson().fromJson(jsonString, User.class);
         String userID = userInput.userId;
+      
+        // Update user using userId as entity identifier.
 
         Entity userToUpdate = new Entity("user", userID);
         userToUpdate.setProperty("userId", userInput.userId);
         userToUpdate.setProperty("name", userInput.name);
         userToUpdate.setProperty("email", userInput.email);
         userToUpdate.setProperty("language", userInput.language);
-        
+
         database.put(userToUpdate);
     }
+
 }
