@@ -12,7 +12,7 @@
     <nb-card class="dialog-template" [nbSpinner]="languageUpdateLoading" nbSpinnerStatus="primary">
       <nb-card-header class="header-container">
         Update Language Preference
-        <button nbSuffix nbButton ghost autofocus (click)="(ref.close() && closeAlert())">
+        <button nbSuffix nbButton ghost autofocus (click)="ref.close(); closeAlert()">
           <nb-icon icon="close"></nb-icon>
         </button>
       </nb-card-header>
@@ -34,7 +34,7 @@
         >
           <nb-option value="en">English</nb-option>
           <nb-option value="fr">French</nb-option>
-          <nb-option value="sp">Spanish</nb-option>
+          <nb-option value="es">Spanish</nb-option>
           <nb-option value="it">Italian</nb-option>
           <nb-option value="sw"> Swahili </nb-option>
           <nb-option value="zh">Chinese</nb-option>
