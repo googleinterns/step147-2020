@@ -26,6 +26,17 @@ export class LoginComponent implements OnInit {
       .login(email, password)
       .then((res: any) => {
         localStorage.setItem('user', JSON.stringify(res.user));
+
+        // Callin firebase.auth() to get idToken that will be sent to the filter in the backend
+        // for authentication using FirebaseApp SDK.
+        // The idToken is stored in localStorage.
+        firebase.auth().currentUser.getIdToken()
+            .then((idToken) => {
+            localStorage.setItem('idToken', idToken);
+            console.log('idToken in login', localStorage.idToken);
+        });
+
+
         this.loginAwait = false;
         this.router.navigate(['/chat']);
     }).then (() => {
