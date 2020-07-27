@@ -34,16 +34,15 @@ import com.google.firebase.auth.FirebaseAuthException;
 public class FirebaseAppInit {
 
     private String jsonFilePath = "/firebaseServiceAccount.json";
+    private String databaseUrl = "https://team147-step2020.firebaseio.com";
 
     public FirebaseApp initializeFirebaseApp() throws IOException {
 
         InputStream serviceAccount = FirebaseAppInit.class.getResourceAsStream(jsonFilePath);
 
-        System.out.println("\n\n\n service account: " + serviceAccount + "\n\n\n");
-
         FirebaseOptions options = new FirebaseOptions.Builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .setDatabaseUrl("https://team147-step2020.firebaseio.com")
+            .setDatabaseUrl(databaseUrl)
             .build();
 
         // Instantiate an instance of the firebase app.
