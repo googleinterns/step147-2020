@@ -117,8 +117,9 @@ public class UserServlet extends HttpServlet {
         String jsonString = IOUtils.toString((request.getInputStream()));
         User userInput = new Gson().fromJson(jsonString, User.class);
         String userID = userInput.userId;
-
+      
         // Update user using userId as entity identifier.
+
         Entity userToUpdate = new Entity("user", userID);
         userToUpdate.setProperty("userId", userInput.userId);
         userToUpdate.setProperty("name", userInput.name);
