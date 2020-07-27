@@ -39,7 +39,6 @@ import java.util.List;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.sps.servlets.MutableHttpServletRequest;
-
 import com.google.sps.servlets.FirebaseAppInit;
 
 
