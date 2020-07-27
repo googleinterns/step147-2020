@@ -8,7 +8,6 @@ import { AuthService } from './auth/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { environment } from './../environments/environment';
-
 import * as firebase from 'firebase/app';
 
 
@@ -16,14 +15,13 @@ import * as firebase from 'firebase/app';
   providedIn: 'root',
 })
 export class ChatDataService {
-  // Creating custom header that will be added to all http requests
+  // Creating custom header that will be added to all http requests.
   httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'X-token': localStorage.idToken
     }),
   };
-
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
@@ -61,7 +59,7 @@ export class ChatDataService {
     return this.http.get<Message[]>(url, this.httpOptions);
   }
 
-  // Get a chatroom for a recepient;
+  // Get a chatroom for a recepient.
   getChatroom(recipient: string): Observable<Chatroom[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
 
