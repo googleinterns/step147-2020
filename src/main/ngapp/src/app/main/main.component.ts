@@ -226,7 +226,7 @@ export class MainComponent implements OnInit {
         const messagePromise = this.fetchMessages(chatroomId);
         messagePromise
           .then((messages) => {
-            this.chatSectionLoading = true;
+            this.chatSectionLoading = false;
             console.log(messages);
           })
           .catch((err) => {
@@ -239,11 +239,11 @@ export class MainComponent implements OnInit {
       const messagePromise = this.fetchMessages(chatroomId);
       messagePromise
         .then((messages) => {
-          this.chatSectionLoading = true;
+          this.chatSectionLoading = false;
           console.log(messages);
         })
         .catch((err) => {
-          this.chatSectionLoading = true;
+          this.chatSectionLoading = false;
           console.error(err);
         });
     }
