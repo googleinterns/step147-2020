@@ -26,7 +26,7 @@ export class ChatDataService {
     return this.http.post<User>('/user', user);
   }
 
-  //
+  // Update the users language on the database.
   updateLanguage(user: User): Observable<any> {
     return this.http.put<User>('/user', user);
   }
