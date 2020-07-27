@@ -26,53 +26,35 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.util.List;
-
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.auth.FirebaseAuthException;
-import java.io.*;
+
+import com.google.sps.servlets.FirebaseAppInit;
 
 /* Servlet that takes an idToken, and then calls firebase to decode it and provide a uid if the token is valid. */
 @WebServlet("/idTokenVerification")
 public class FirebaseAuthVerification extends HttpServlet {
 
-    FirebaseToken decodedToken;
     FirebaseToken decodedUseridToken;   
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException  {
 
-        InputStream serviceAccount = FirebaseAuthVerification.class.getResourceAsStream("/firebaseServiceAccount.json");
+        FirebaseAppInit firebaseAppInit = new FirebaseAppInit();
+        FirebaseApp firebaseApp = firebaseAppInit.initializeFirebaseApp();
 
-        FirebaseOptions options = new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .setDatabaseUrl("https://team147-step2020.firebaseio.com")
-            .build();
-
-        // Instantiate an instance of the firenase a
-        FirebaseApp firebaseApp = null;
-        List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
-        if(firebaseApps!=null && !firebaseApps.isEmpty()){
-            for(FirebaseApp app : firebaseApps){
-                if(app.getName().equals(FirebaseApp.DEFAULT_APP_NAME))
-                    firebaseApp = app;
-                }
-            }
-        else {
-            firebaseApp = FirebaseApp.initializeApp(options);   
-        }
-
-        System.out.println("\n\n\n\n\n" + firebaseApp + "\n\n\n\n");
+        System.out.println("fbapp instance in FirebaseAuthVerif\n\n\n\n\n" + firebaseApp + "\n\n\n\n");
        
         // idToken comes from the Frontend.
         String idToken = request.getHeader("X-token");
         
-        System.out.println("\n\n\n\n\n" + idToken + "\n\n\n\n");
+        System.out.println("\n\n\n idToken in fbauthverification" + idToken + "\n\n\n");
 
+        //FirebaseToken decodedUseridToken = null;   
         try {
-            decodedUseridToken = verifyIdTokenCheckRevoked(idToken, request);
+            decodedUseridToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
         } catch (FirebaseAuthException e) {
             System.out.println(e.getMessage());
         }
@@ -84,14 +66,4 @@ public class FirebaseAuthVerification extends HttpServlet {
         response.getWriter().println(gson.toJson(uid));
 
     }
-
-  public FirebaseToken verifyIdTokenCheckRevoked(String idToken, HttpServletRequest request) throws FirebaseAuthException {
-    try {
-        decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
-    } catch (FirebaseAuthException e) {
-        System.out.println(e);
-    }
-    return decodedToken;
-  }
-
 }
