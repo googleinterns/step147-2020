@@ -33,9 +33,11 @@ import com.google.firebase.auth.FirebaseAuthException;
 
 public class FirebaseAppInit {
 
+    private String jsonFilePath = "/firebaseServiceAccount.json";
+
     public FirebaseApp initializeFirebaseApp() throws IOException {
 
-        InputStream serviceAccount = FirebaseAppInit.class.getResourceAsStream("/firebaseServiceAccount.json");
+        InputStream serviceAccount = FirebaseAppInit.class.getResourceAsStream(jsonFilePath);
 
         System.out.println("\n\n\n service account: " + serviceAccount + "\n\n\n");
 
