@@ -77,20 +77,16 @@ public class UserServlet extends HttpServlet {
 
         String userID = request.getHeader("userId");
 
-        if (userID == null) {
+        if (userID == null || recipientID == null) {
             response.sendError(500);
         } else {
             Query query = new Query("user");
             query.setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userID));
 
             Entity userEntity = database.prepare(query).asSingleEntity();
-            
             User user = new User(userEntity);
-            PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
-
 
             Gson gson = new Gson();
-
             response.setContentType("application/json");
             response.getWriter().println(gson.toJson(user));
         }
@@ -98,34 +94,44 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String jsonString = IOUtils.toString((request.getInputStream()));
-        User userInput = new Gson().fromJson(jsonString, User.class);
 
-        String userID = userInput.userId;
-        
-        // Entity with a userID as identifier.
-        Entity newUser = new Entity("user", userID);
-        newUser.setProperty("userId", userInput.userId);
-        newUser.setProperty("name", userInput.name);
-        newUser.setProperty("email", userInput.email);
-        newUser.setProperty("language", userInput.language);
-        database.put(newUser);
+        String userID = request.getHeader("userId");
+
+        if (userID == null || recipientID == null) {
+            response.sendError(500);
+        } else {
+            String jsonString = IOUtils.toString((request.getInputStream()));
+            User userInput = new Gson().fromJson(jsonString, User.class);
+
+            // Entity with a userID as identifier.
+            Entity newUser = new Entity("user", newPost.userId);
+            newUser.setProperty("userId", newPost.userId);
+            newUser.setProperty("name", userInput.name);
+            newUser.setProperty("email", userInput.email);
+            newUser.setProperty("language", userInput.language);
+            database.put(newUser);
+        }
     }
 
     @Override
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String jsonString = IOUtils.toString((request.getInputStream()));
-        User userInput = new Gson().fromJson(jsonString, User.class);
-        String userID = userInput.userId;
 
-        // Update user using userId as entity identifier.
-        Entity userToUpdate = new Entity("user", userID);
-        userToUpdate.setProperty("userId", userInput.userId);
-        userToUpdate.setProperty("name", userInput.name);
-        userToUpdate.setProperty("email", userInput.email);
-        userToUpdate.setProperty("language", userInput.language);
+        String userID = request.getHeader("userId");
 
-        database.put(userToUpdate);
+        if (userID == null || recipientID == null) {
+            response.sendError(500);
+        } else {
+        
+            String jsonString = IOUtils.toString((request.getInputStream()));
+            User userInput = new Gson().fromJson(jsonString, User.class);
+            // Update user using userId as entity identifier.
+            Entity userToUpdate = new Entity("user", newPost.userId);
+            userToUpdate.setProperty("userId", newPost.userId);
+            userToUpdate.setProperty("name", userInput.name);
+            userToUpdate.setProperty("email", userInput.email);
+            userToUpdate.setProperty("language", userInput.language);
+
+            database.put(userToUpdate);
+        }
     }
-
 }
