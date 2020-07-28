@@ -213,7 +213,7 @@ public class ChatroomServletTest {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId")).thenReturn((String) caller.getProperty("userId"));
+        Mockito.when(request.getHeader("userId")).thenReturn((String) caller.getProperty("userId"));
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         chatroomServlet.doGet(request, response);

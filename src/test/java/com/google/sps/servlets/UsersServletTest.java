@@ -116,7 +116,7 @@ public class UsersServletTest {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId")).thenReturn("11234567890");
+        Mockito.when(request.getHeader("userId")).thenReturn("11234567890");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         ArrayList<User> users = new ArrayList<User>();

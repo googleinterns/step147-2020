@@ -176,7 +176,7 @@ public class MessageServletTest {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId")).thenReturn((String) user1.getProperty("userId"));
+        Mockito.when(request.getHeader("userId")).thenReturn((String) user1.getProperty("userId"));
         Mockito.when(request.getParameter("recipientId")).thenReturn((String) user2.getProperty("userId"));
         
         Mockito.when(response.getWriter()).thenReturn(printWriter);
