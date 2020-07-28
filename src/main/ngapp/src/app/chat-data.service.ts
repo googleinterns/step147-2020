@@ -37,9 +37,9 @@ export class ChatDataService {
   }
 
   // Get messages between two users.
-  getMessages(id: string): Observable<Message[]> {
+  getMessages(): Observable<Message[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-    const url: string = '/messages?chatroomId=' + id;
+    const url: string = '/messages?userId=' + localUser.uid;
     return this.http.get<Message[]>(url);
   }
 
