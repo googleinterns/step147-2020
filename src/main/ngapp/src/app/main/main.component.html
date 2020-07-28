@@ -89,20 +89,19 @@
               nbSpinnerStatus="danger"
             >
               <app-chat-bar
-                [users]="chatroomUsers"
+                [users]="chatroomUsers" 
                 (changeChat)="onChange($event)"
               ></app-chat-bar>
             </div>
           </div>
 
           <div class="mesgs">
-            <div *ngIf="!messages" class="no_messages">
+            <div *ngIf="!currentChat" class="no_messages">
               <p>Please select a user to chat</p>
             </div>
             <app-chat-section
-              *ngIf="messages"
-              [messages]="messages"
-              [selectedUser]="selectedUser"
+              *ngIf="currentChat"
+              [selectedUser]="currentChat"
               (emitMessage)="onNewMessage($event)"
             ></app-chat-section>
           </div>
