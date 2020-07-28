@@ -41,6 +41,7 @@ import {
   NbDialogModule,
   NbAutocompleteModule,
   NbStepperModule,
+  NbBadgeModule,
 } from '@nebular/theme';
 
 // My web app's Firebase configuration.
@@ -97,6 +98,7 @@ const firebaseConfig = {
     NbDialogModule.forRoot(),
     NbAutocompleteModule,
     NbStepperModule,
+    NbBadgeModule
   ],
   providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
   bootstrap: [AppComponent],
