@@ -39,47 +39,31 @@ import java.util.List;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.sps.servlets.MutableHttpServletRequest;
+import com.google.sps.servlets.FirebaseAppInit;
 
 
 @WebFilter(urlPatterns= {"/chatrooms", "/user", "/users", "/getChatroom", "/messages"})
 public class AuthFilter implements Filter {
 
-    private FirebaseToken decodedToken;
-    private FirebaseToken decodedUseridToken;
+    FirebaseAppInit firebaseAppInit;
+    FirebaseApp firebaseApp;
+
+    // Create an instance of FirebaseApp.
+    public AuthFilter() throws IOException {
+        firebaseAppInit = new FirebaseAppInit();
+        firebaseApp = firebaseAppInit.initializeFirebaseApp();
+    }
 
     public void init(FilterConfig config) {}
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         
-
         HttpServletRequest req = (HttpServletRequest) request;
-        InputStream serviceAccount = FirebaseAuthVerification.class.getResourceAsStream("/firebaseServiceAccount.json");
-
-        FirebaseOptions options = new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .setDatabaseUrl("https://team147-step2020.firebaseio.com")
-            .build();
-
-        // Instantiate an instance of the firebase
-        FirebaseApp firebaseApp = null;
-        List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
-        if (firebaseApps != null && !(firebaseApps.isEmpty())) {
-            for (FirebaseApp app : firebaseApps) {
-                if (app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)) {
-                    firebaseApp = app;
-                }
-            }
-        } else {
-            firebaseApp = FirebaseApp.initializeApp(options);   
-        }
-
-        System.out.println("\n\n\n this is firebaseapp instance: " + firebaseApp + "\n\n\n");
 
         // idToken comes from the Frontend as a parameter.
         String idToken = req.getHeader("X-token");
 
-        System.out.println("\n\n\n this is idtoken: " + idToken + "\n\n\n");
-
+        FirebaseToken decodedUseridToken = null;
         try {
             decodedUseridToken = FirebaseAuth.getInstance().verifyIdToken(idToken);;
         } catch (FirebaseAuthException e) {
@@ -87,14 +71,10 @@ public class AuthFilter implements Filter {
         }
 
         String uid = decodedUseridToken.getUid();
-        Gson gson = new Gson();
 
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(req);
 
         mutableRequest.putHeader("userId", uid);
         chain.doFilter(mutableRequest, response);
-        System.out.println("\n\n\n we reached here in AuthFilter\n\n\n");
-
-        System.out.println("\n\n\nuid from authfilter", + uid + "\n\n\n");
     }
 }
