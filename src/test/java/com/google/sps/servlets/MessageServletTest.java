@@ -178,7 +178,8 @@ public class MessageServletTest {
 
         Mockito.when(request.getHeader("userId")).thenReturn((String) user1.getProperty("userId"));
         Mockito.when(request.getParameter("recipientId")).thenReturn((String) user2.getProperty("userId"));
-        
+        Mockito.when(request.getParameter("chatroomId")).thenReturn((String) user2.getProperty("1"));
+
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         Gson gson = new Gson();
@@ -216,7 +217,7 @@ public class MessageServletTest {
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         PrintWriter printWriter = Mockito.mock(PrintWriter.class);
 
-        Mockito.when(request.getParameter("userId")).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(request.getHeader("userId")).thenReturn(UUID.randomUUID().toString());
         Mockito.when(request.getParameter("recipientId")).thenReturn(UUID.randomUUID().toString());
         
         Mockito.when(response.getWriter()).thenReturn(printWriter);
