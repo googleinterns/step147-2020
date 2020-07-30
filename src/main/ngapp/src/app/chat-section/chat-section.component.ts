@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Message } from '../models/message';
 import { User } from '../models/user';
+import { Chat } from '../models/chat';
 
 @Component({
   selector: 'app-chat-section',
@@ -9,11 +10,9 @@ import { User } from '../models/user';
 })
 export class ChatSectionComponent implements OnInit {
   @Output() emitMessage: EventEmitter<String> = new EventEmitter();
-  @Input() messages: Message[];
-  @Input() selectedUser: User;
+  @Input() selectedUser: Chat;
 
   currId: string;
-
   constructor() {}
 
   ngOnInit() {

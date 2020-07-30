@@ -50,18 +50,17 @@ public class ChatroomServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String userID = request.getParameter("userId");
-
+        String userID = request.getHeader("userId");
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        if (userID == null) {
+        if (userID == null || recipientID == null) {
             response.sendError(500);
         } else {
             Query chatroomQuery = new Query("chatroom");
-            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(
-                    new FilterPredicate("user1", FilterOperator.EQUAL, userID),
-                    new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
-
+            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(
+                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user1", FilterOperator.EQUAL, recipientID))),
+                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user2", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, recipientID)))
+            )));
             PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
             
             ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();

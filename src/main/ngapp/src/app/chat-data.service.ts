@@ -19,18 +19,17 @@ export class ChatDataService {
   httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'X-token': localStorage.idToken
+        'x-token': localStorage.idToken
     }),
   };
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
   // Get the object associated with the currrent user.
-  getUser(): Observable<User[]> {
+  getUser(): Observable<User> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-
     // Adding httpOptions to the url.
-    return this.http.get<User[]>('/user?userId=' + localUser.uid, this.httpOptions);
+    return this.http.get<User>('/user?userId=' + localUser.uid, this.httpOptions);
   }
 
   // Create a new user object for the user.
@@ -51,11 +50,11 @@ export class ChatDataService {
   }
 
   // Get messages between two users.
-  getMessages(id: string): Observable<Message[]> {
+  getMessages(): Observable<Message[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-    const url: string = '/messages?chatroomId=' + id;
-
+    
     // Adding httpOptions to the url.
+    const url: string = '/messages?userId=' + localUser.uid;
     return this.http.get<Message[]>(url, this.httpOptions);
   }
 
@@ -79,10 +78,8 @@ export class ChatDataService {
   }
 
   // Add message in a new chatroom.
-  addMessage(input: Post) {
-
-    const promise = this.http.post<Post>('/messages', input, this.httpOptions).toPromise();
-    promise.catch((err) => console.error('Error sending new message: ', err));
+  addMessage(input: Post): Observable<any> {
+    return this.http.post<Post>('/messages', input, this.httpOptions);
   }
 
   // Logout of the service.

@@ -47,7 +47,7 @@ public class GetChatroom extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String userID = request.getParameter("userId");
+        String userID = request.getHeader("userId");
         String recipientID = request.getParameter("recipientId"); // the user whose chat was clicked
         
         if (userID == null || recipientID == null) {
@@ -65,20 +65,7 @@ public class GetChatroom extends HttpServlet {
 
             
             Entity chatroom = datastore.prepare(chatroomQuery).asSingleEntity();
-
-            List<Chatroom> returnChatroom = new ArrayList<Chatroom>();
-
-            if(chatroom == null){
-                Entity newChatroom = new Entity("chatroom");
-                chatroomID = UUID.randomUUID().toString();
-                newChatroom.setProperty("chatroomId", chatroomID);
-                newChatroom.setProperty("user1", userID);
-                newChatroom.setProperty("user2", recipientID);
-                datastore.put(newChatroom);
-                returnChatroom.add(new Chatroom(newChatroom));
-            }else {
-                returnChatroom.add(new Chatroom(chatroom));
-            }
+            Chatroom returnChatroom = new Chatroom(chatroom);
 
             Gson gson = new Gson();
             response.setContentType("application/json");

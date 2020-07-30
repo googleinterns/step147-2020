@@ -13,7 +13,6 @@
 // limitations under the License.
 
 package com.google.sps.servlets;
-
 import javax.servlet.FilterChain;
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
@@ -61,11 +60,11 @@ public class AuthFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
 
         // idToken comes from the Frontend as a parameter.
-        String idToken = req.getHeader("X-token");
+        String idToken = req.getHeader("x-token");
 
         FirebaseToken decodedUseridToken = null;
         try {
-            decodedUseridToken = FirebaseAuth.getInstance().verifyIdToken(idToken);;
+            decodedUseridToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
         } catch (FirebaseAuthException e) {
             System.out.println(e.getMessage());
         }
