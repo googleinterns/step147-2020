@@ -12,9 +12,14 @@ import { User } from '../models/user';
 export class SelectLanguageComponent implements OnInit {
   constructor(public chatService: ChatDataService, private router: Router) {}
 
+  updatingUser = false;
+  updatingUserError: boolean;
+  updatingUserErrorMessage: string; 
+
   ngOnInit(): void {}
 
   signUp(nameInput: string, languageInput: string) {
+    this.updatingUser = true;
     const localUser = JSON.parse(localStorage.getItem('user'));
     let userInstance: User = {
       userId: localUser.uid,
@@ -25,12 +30,19 @@ export class SelectLanguageComponent implements OnInit {
 
     const addUserPromise = this.chatService.addUser(userInstance).toPromise();
 
-    addUserPromise
-      .then((res) => {
+    addUserPromise.then((res) => {
+        this.updatingUser = false;
         this.router.navigate(['/chat']);
       })
       .catch((err) => {
+        this.updatingUser = false;
+        this.updatingUserError = true;
+        this.updatingUserErrorMessage = err;
         console.error(err);
       });
+  }
+
+  closeAlert(){
+    this.updatingUserError = false;
   }
 }
