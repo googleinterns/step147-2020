@@ -1,6 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { NbMenuService } from '@nebular/theme';
-import { NbDialogService } from '@nebular/theme';
+import { NbMenuService, NbDialogService, NbToastrService } from '@nebular/theme';
 import { ChatDataService } from '../chat-data.service';
 import { PusherService } from '../pusher.service';
 import { User } from '../models/user';
@@ -30,8 +29,11 @@ export class MainComponent implements OnInit {
   currentChat: Chat;
 
   // Variables to update spinners.
-  chatBarLoading = false;
-  chatSectionLoading = false;
+  languageUpdateLoading = false;
+  languageUpdateError: boolean;
+  languageUpdateErrorMessage: boolean;
+  sendingMessage: boolean = false;
+  sendMessageError: string;
 
   // Menu items.
   menuItems = [{ title: 'Settings' }, { title: 'Logout' }];
@@ -45,33 +47,43 @@ export class MainComponent implements OnInit {
     private chatService: ChatDataService,
     private pusher: PusherService,
     private nbMenuService: NbMenuService,
-    private dialogService: NbDialogService
+    private dialogService: NbDialogService,
+    private toastrService: NbToastrService
   ) {}
 
   ngOnInit(): void {
     // Retrieve data on first load
-    this.chatBarLoading = true;
     const localUser = JSON.parse(localStorage.getItem('user'));
     this.currId = localUser.uid;
 
     const usersPromise = this.chatService.getUsers().toPromise();
-    const chatroomsPromise = this.chatService.getChatrooms().toPromise();
-    const messagePromise = this.chatService.getMessages().toPromise();
-
-    Promise.all([usersPromise, chatroomsPromise, messagePromise]).then(results => {
-        this.users = results[0].filter(user => user.userId !== this.currId);
+    usersPromise.then(users => {
+        this.users = users.filter(user => user.userId !== this.currId);
         this.filteredUsers$ = of(this.users);
-        this.chatrooms = results[1];
-        this.messages = results[2];
+        this.pusher.setPusher("users");
+        this.pusher.channel.bind('new-user', (user) => {
+            console.log("New user");
+            this.users.push(JSON.parse(user));
+            this.filteredUsers$ = of(this.users);
+        });
 
-        this.filterChatroomUsers();
-        this.setPusher();
-        this.chatBarLoading = false;
-
+        const chatroomsPromise = this.chatService.getChatrooms().toPromise();
+        chatroomsPromise.then(chatrooms => {
+            this.chatrooms = chatrooms;
+            const messagePromise = this.chatService.getMessages().toPromise();
+            messagePromise.then(messages => {
+                this.messages = messages;
+                this.filterChatroomUsers();
+                this.setPusher();
+            }).catch(err => {
+                console.error("Error in fetching messages: ", err);
+            });
+        }).catch(err => {
+            console.error("Error in fetching chatrooms: ", err);
+        })
     }).catch(err => {
-        this.chatBarLoading = false;
-        console.error("There was a problem connecting to the server");
-    });
+        console.error("Error in fetching users: ", err);
+    })
 
     // Subscribe to changes in the menu.
     this.nbMenuService.onItemClick()
@@ -108,17 +120,22 @@ export class MainComponent implements OnInit {
 
   // Function triggered once a user selects a user selects a user in chat bar.
   onSelectionChange(user: User) {
+    console.log(user);
     this.filteredUsers$ = this.getFilteredUsers(user.name);
-    let localChat = this.chatroomUsers.find(chat => chat.userId === user.userId);
+    const localChatArray = this.chatroomUsers.filter(chat => chat.userId === user.userId);
+    let localChat;
 
-    if(!localChat){
-        localChat = {
+    if(localChatArray.length === 0){
+        const newChat: Chat = {
             userId: user.userId,
             name: user.name,
             chatroomId: "",
             messages: [],
             unread: 0
         };
+        localChat = newChat;
+    }else{
+        localChat = localChatArray[0];
     }
 
     this.onChange(localChat);
@@ -133,51 +150,77 @@ export class MainComponent implements OnInit {
 
   // Function to make a http call to update the user's preferred language
   updateLanguage(selectedLanguage: string) {
-    const localUser: User = {
-      userId: this.currId,
-      name: '',
-      email: '',
-      language: selectedLanguage,
-    };
+    this.languageUpdateLoading = true;
+    const fetchUserPromise = this.chatService.getUser().toPromise();
+    fetchUserPromise.then(user => {
 
-    const putRequest = this.chatService.updateLanguage(localUser).toPromise();
-    putRequest
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
+        const localUser: User = {
+            userId: this.currId,
+            name: user.name,
+            email: user.email,
+            language: selectedLanguage,
+        };
+
+        const putRequest = this.chatService.updateLanguage(localUser).toPromise();
+        putRequest.then((res) => {
+            this.languageUpdateLoading = false;
+            this.languageUpdateError = false;
+            console.log(res);
+        })
+        .catch((err) => {
+            this.languageUpdateLoading = false;
+            this.languageUpdateError = true;
+            this.languageUpdateErrorMessage = err.message;
+            console.error(err);
+        });
+    }).catch(err => {
+        this.languageUpdateLoading = false;
+        this.languageUpdateError = true;
+        this.languageUpdateErrorMessage = err.message;
         console.error(err);
-      });
+    });
+  }
+
+  // Close alters 
+  closeAlert(){
+      this.languageUpdateError = null;
   }
 
   // Helper function to filter chatrooms and return the users in the chatrooms.
   filterChatroomUsers() {
-    let chats: Chat[];
+    let chats: Chat[] = [];
     this.users.forEach(user => {
-        const gotChatroom = this.chatrooms.find(chatroom => chatroom.users.includes(user.userId));
+        const gotChatroomArray = this.chatrooms.filter(chatroom => chatroom.users.includes(user.userId));
 
-        if(gotChatroom){
-            const newChat: Chat = {
-                userId: user.userId,
-                name: user.name,
-                chatroomId: gotChatroom.chatroomId,
-                messages: this.messages.filter(message => message.chatroomId === gotChatroom.chatroomId),
-                unread: 0
-            };
+        if(gotChatroomArray.length !== 0){
+            const newChat : Chat = this.createNewChat(user, gotChatroomArray[0].chatroomId);
             chats.push(newChat);
         }
     });
 
     this.chatroomUsers = chats;
-    this.chatroomUsers.sort((a, b) => a.messages[a.messages.length - 1].timestamp - b.messages[b.messages.length - 1].timestamp);
+    this.chatroomUsers.sort((a, b) =>  b.messages[b.messages.length - 1].timestamp - a.messages[a.messages.length - 1].timestamp);
 
+  }
+
+  // Function to create new chats for users;
+  createNewChat(user: User, newChatroomId: string): Chat{
+      const newChat : Chat = {
+          userId: user.userId,
+          name: user.name,
+          chatroomId: newChatroomId,
+          messages: this.messages.filter(message => message.chatroomId === newChatroomId),
+          unread : 0
+      }
+
+      return newChat;
   }
 
   // Function that handles switching data and messages depending on who is selected.
   onChange(chat: Chat){
     this.currentChat = chat;
     const index = this.chatroomUsers.findIndex(chatUser => chatUser.chatroomId === chat.chatroomId);
-    if(index){
+    if(index !== -1){
         this.chatroomUsers[index].unread = 0;
     }
   }
@@ -186,44 +229,80 @@ export class MainComponent implements OnInit {
   setPusher(){
     this.pusher.setPusher(this.currId);
     this.pusher.channel.bind('new-message', (data) => {
-        this.messages.push(JSON.parse(data));
-        const chatroom = this.chatrooms.find(chatroom => chatroom.chatroomId === data.chatroomId);
+        const incomingData = JSON.parse(data);
+        this.messages.push(incomingData);
+        const chatroomPushArray = this.chatroomUsers.filter(chat => chat.chatroomId === incomingData.chatroomId);
 
-        if(!chatroom){
+        if(chatroomPushArray.length === 0){
             const chatroomPromise = this.chatService.getChatrooms().toPromise();
             chatroomPromise.then(chatrooms => {
                 this.chatrooms = chatrooms;
-                this.filterChatroomUsers();
-                this.addBadge(data.chatroomId);
-            })
+                const userArray = this.users.filter(user => {
+                    if(user.userId === incomingData.senderId || user.userId === incomingData.recipientId){
+                        return user;
+                    }
+                });
+                const newChat: Chat = this.createNewChat(userArray[0], incomingData.chatroomId);
+                this.chatroomUsers.push(newChat);
+                this.addBadge(incomingData.chatroomId);
+                this.chatroomUsers.sort((a, b) =>  b.messages[b.messages.length - 1].timestamp - a.messages[a.messages.length - 1].timestamp);
+            });
         }else{
-            this.filterChatroomUsers();
-            this.addBadge(chatroom.chatroomId);
+            this.updateChats(incomingData);
+            this.addBadge(incomingData.chatroomId);
+            this.chatroomUsers.sort((a, b) =>  b.messages[b.messages.length - 1].timestamp - a.messages[a.messages.length - 1].timestamp);
         }
 
-        if(this.currentChat.chatroomId === data.chatrooomId){
+        if(this.currentChat){
             this.currentChat = this.chatroomUsers.find(chat => chat.chatroomId === this.currentChat.chatroomId);
         }
     });
   }
 
+  // Update chats.
+  updateChats(message: Message){
+      const index = this.chatroomUsers.findIndex(chat => chat.chatroomId === message.chatroomId);
+      if(index !== -1){
+          this.chatroomUsers[index].messages.push(message);
+      }
+  }
+
   // Function to add a badge to user with new message
   addBadge(chatroomId: string){
-      if(this.currentChat.chatroomId !== chatroomId){
-          const index = this.chatroomUsers.findIndex(chat => chat.chatroomId === chatroomId);
-          this.chatroomUsers[index].unread += 1;
+      if(this.currentChat && this.currentChat.chatroomId !== chatroomId){
+        const index = this.chatroomUsers.findIndex(chat => chat.chatroomId === chatroomId);
+        if(index !== -1){
+            this.chatroomUsers[index].unread += 1;
+            this.toastrService.show("You have a new message", "New Message!");
+        }
+      }else if(!this.currentChat){
+        const index = this.chatroomUsers.findIndex(chat => chat.chatroomId === chatroomId);
+        if(index !== -1){
+            this.chatroomUsers[index].unread += 1;
+            this.toastrService.show("You have a new message", "New Message!");
+        }
       }
   }
 
   // Function to make a http call to send a new message to server.
   onNewMessage(newMessage: string) {
+    this.sendingMessage = true;
+
     const newPost: Post = {
       senderId: this.currId,
       recipientId: this.currentChat.userId,
       text: newMessage,
       chatroomId: this.currentChat.chatroomId,
     };
-    this.chatService.addMessage(newPost);
+    const messageSend = this.chatService.addMessage(newPost).toPromise();
+    messageSend.then(res => {
+        this.sendingMessage = false;
+        console.log(res);
+    }).catch(err => {
+        this.sendingMessage = false;
+        this.toastrService.show(`There was an error in sending the message: ${err.message}`, "Message Not Sent!");
+        console.error(err);
+    })
   }
 
   // Function to log user out.
