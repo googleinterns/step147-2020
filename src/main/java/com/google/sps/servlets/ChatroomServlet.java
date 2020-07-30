@@ -53,14 +53,11 @@ public class ChatroomServlet extends HttpServlet {
         String userID = request.getHeader("userId");
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        if (userID == null || recipientID == null) {
+        if (userID == null) {
             response.sendError(500);
         } else {
             Query chatroomQuery = new Query("chatroom");
-            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.AND, Arrays.asList(
-                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user1", FilterOperator.EQUAL, recipientID))),
-                new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user2", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, recipientID)))
-            )));
+            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
             PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
             
             ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
@@ -70,7 +67,6 @@ public class ChatroomServlet extends HttpServlet {
             }
 
             Gson gson = new Gson();
-        
             response.setContentType("application/json");
             response.getWriter().println(gson.toJson(chatroomsList));
         }
