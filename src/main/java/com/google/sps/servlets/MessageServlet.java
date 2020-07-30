@@ -53,27 +53,24 @@ public class MessageServlet extends HttpServlet {
         String userID = request.getHeader("userId");
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        if (userID == null || recipientID == null) {
+        if (userID == null) {
             response.sendError(500);
         } else {
             // Goes through messages and grabs the messages with chatroomID = to the chatroomID passed in
             // then sorts them by timestamp.
             Query messageQuery = new Query("message").addSort("timestamp", SortDirection.ASCENDING);
-            messageQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(
-                new FilterPredicate("senderId", FilterOperator.EQUAL, userID),
-                new FilterPredicate("recipientId", FilterOperator.EQUAL, userID)))
-            );
-
             PreparedQuery results = datastore.prepare(messageQuery);
 
             ArrayList<Message> messagesInChatroom = new ArrayList<Message>();
 
             for (Entity message : results.asIterable()) {
-                messagesInChatroom.add(new Message(message););
+                Message messageInstance = new Message(message);
+                if(messageInstance.senderId.equals(userID) || messageInstance.recipientId.equals(userID)){
+                    messagesInChatroom.add(messageInstance);
+                }
             }
             
             Gson gson = new Gson();
-        
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             response.getWriter().println(gson.toJson(messagesInChatroom));
@@ -85,13 +82,12 @@ public class MessageServlet extends HttpServlet {
         
         String userID = request.getHeader("userId");
         
-        if (userID == null || recipientID == null) {
+        if (userID == null) {
             response.sendError(500);
         } else {
             String jsonString = IOUtils.toString(request.getInputStream());
             Post newPost = new Gson().fromJson(jsonString, Post.class);
             DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    
             String chatroomID;
     
             if(newPost.chatroomId.equals("")){
