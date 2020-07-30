@@ -11,6 +11,7 @@ import { Chat } from '../models/chat';
 export class ChatSectionComponent implements OnInit {
   @Output() emitMessage: EventEmitter<String> = new EventEmitter();
   @Input() selectedUser: Chat;
+  @Input() messageInTransit: boolean;
 
   currId: string;
   constructor() {}
