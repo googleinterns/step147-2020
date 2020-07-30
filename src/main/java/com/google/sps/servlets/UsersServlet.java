@@ -38,9 +38,8 @@ public class UsersServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
         String userID = request.getHeader("userId");
-
         if (userID == null) {
-            response.sendError(500);
+            response.sendError(401);
         } else {
             Query query = new Query("user");
             PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
@@ -49,12 +48,10 @@ public class UsersServlet extends HttpServlet {
 
             for (Entity user : results.asIterable()) {
                 User userInstance = new User(user);
-                if (!(userInstance.userId.equals(userID))){
-                    users.add(userInstance);
-                }
+                users.add(userInstance);
             }
-            Gson gson = new Gson();
 
+            Gson gson = new Gson();
             response.setContentType("application.json");
             response.getWriter().println(gson.toJson(users));
         }
