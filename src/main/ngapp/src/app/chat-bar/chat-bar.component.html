@@ -5,8 +5,7 @@
       (click)="onSelect(user)"
       class="chat_list"
     >
-      <nb-user [name]="user.name | titlecase" [title]="getLastMessage(user.messages)"></nb-user>
-      
+      <nb-user [name]="user.name | titlecase" [title]="getLastMessage(user.messages)" [badgeText]="user.unread" badgeStatus="success" badgePosition="right"></nb-user>
     </nb-list-item>
   </nb-list>
 </nb-card>
