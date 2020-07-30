@@ -77,6 +77,7 @@ export class AuthService {
       .signOut()
       .then((res) => {
         localStorage.removeItem('user');
+        localStorage.removeItem('idToken');
         this.router.navigate(['/']);
       })
       .catch((err: any) => console.error('Error with logging out user: ', err));
@@ -105,6 +106,11 @@ export class AuthService {
     });
     return this.afAuth.signInWithPopup(provider).then((result) => {
       localStorage.setItem('user', JSON.stringify(result.user));
+
+      firebase.auth().currentUser.getIdToken().then((idToken) => {
+        localStorage.setItem('idToken', idToken);
+      });
+      
       return result;
     });
   }
