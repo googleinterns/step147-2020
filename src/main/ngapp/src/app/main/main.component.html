@@ -2,60 +2,61 @@
   <nb-layout-header fixed>
     <div class="header-container">
       <div class="text-center">Auto Translating Chat App</div>
-
-      <nb-actions size="medium" class="pull-right">
-        <nb-action
-          icon="person-outline"
-          status="primary"
-          [nbContextMenu]="menuItems"
-          nbContextMenuTag="my-context-menu"
-        ></nb-action>
-      </nb-actions>
+      <button nbButton size="large" class="pull-right" [nbContextMenu]="menuItems" nbContextMenuTag="my-context-menu">
+          <nb-icon icon="person-outline" status="primary" size="large"></nb-icon>
+      </button>
     </div>
   </nb-layout-header>
 
-  <ng-template #dialog let-data let-ref="dialogRef">
-    <nb-card class="dialog-template">
-      <nb-card-header class="header-container" (click)="ref.close()">
-        Update Language Preference
-        <button nbSuffix nbButton ghost autofocus>
-          <nb-icon icon="close"></nb-icon>
-        </button>
-      </nb-card-header>
-      <nb-card-body>
-        Kindly update your language
-        <nb-select
-          placeholder="Select Showcase"
-          ngModel
-          #language="ngModel"
-          name="language"
-          id="language"
-          required
-        >
-          <nb-option value="en">English</nb-option>
-          <nb-option value="fr">French</nb-option>
-          <nb-option value="sp">Spanish</nb-option>
-          <nb-option value="it">Italian</nb-option>
-          <nb-option value="sw"> Swahili </nb-option>
-          <nb-option value="zh">Chinese</nb-option>
-          <nb-option value="ar">Arabic </nb-option>
-          <nb-option value="de">German </nb-option>
-        </nb-select>
-      </nb-card-body>
-      <nb-card-footer>
-        <button
-          nbButton
-          status="primary"
-          [disabled]="language.invalid"
-          (click)="updateLanguage(language.value)"
-        >
-          Update
-        </button>
-      </nb-card-footer>
-    </nb-card>
-  </ng-template>
+  <nb-layout-column [nbSpinner]="!chatroomUsers" nbSpinnerStatus="primary">
 
-  <nb-layout-column>
+    <ng-template #dialog let-data let-ref="dialogRef">
+        <nb-card class="dialog-template">
+        <nb-card-header class="header-container">
+            Update Language Preference
+            <button nbSuffix nbButton ghost autofocus (click)="ref.close(); closeAlert()">
+                <nb-icon icon="close"></nb-icon>
+            </button>
+        </nb-card-header>
+        <nb-card-body>
+            <nb-alert status="danger" closable (close)="closeAlert()" *ngIf="languageUpdateError === true">
+                {{ languageUpdateErrorMessage }}
+            </nb-alert>
+            <nb-alert status="success" closable (close)="closeAlert()" *ngIf="languageUpdateError === false">
+                Success
+            </nb-alert>
+            Kindly update your language
+            <nb-select
+            placeholder="Select Showcase"
+            ngModel
+            #language="ngModel"
+            name="language"
+            id="language"
+            required
+            >
+            <nb-option value="en">English</nb-option>
+            <nb-option value="fr">French</nb-option>
+            <nb-option value="es">Spanish</nb-option>
+            <nb-option value="it">Italian</nb-option>
+            <nb-option value="sw"> Swahili </nb-option>
+            <nb-option value="zh">Chinese</nb-option>
+            <nb-option value="ar">Arabic </nb-option>
+            <nb-option value="de">German </nb-option>
+            </nb-select>
+        </nb-card-body>
+        <nb-card-footer>
+            <button
+            nbButton
+            status="primary"
+            [disabled]="language.invalid"
+            (click)="updateLanguage(language.value)"
+            >
+            Update
+            </button>
+        </nb-card-footer>
+        </nb-card>
+    </ng-template>
+
     <div class="content" role="main">
       <div class="container">
         <div class="inbox_msg">
@@ -83,16 +84,10 @@
               </nb-autocomplete>
             </div>
 
-            <div
-              *ngIf="chatroomUsers"
-              [nbSpinner]="chatBarLoading"
-              nbSpinnerStatus="danger"
-            >
               <app-chat-bar
                 [users]="chatroomUsers" 
                 (changeChat)="onChange($event)"
               ></app-chat-bar>
-            </div>
           </div>
 
           <div class="mesgs">
@@ -102,6 +97,7 @@
             <app-chat-section
               *ngIf="currentChat"
               [selectedUser]="currentChat"
+              [messageInTransit]="sendingMessage"
               (emitMessage)="onNewMessage($event)"
             ></app-chat-section>
           </div>
