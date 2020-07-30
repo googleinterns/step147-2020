@@ -23,7 +23,7 @@ export class RegisterComponent implements OnInit {
 
     this.registerAwait = true;
     this.authService.register(frm).then((res) => {
-        
+        console.log("Firebase signup: ", res.user);
         const userInstance : User = {
                 userId : res.user.uid,
                 name : frm.firstName + " " + frm.lastName,
