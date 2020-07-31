@@ -15,64 +15,105 @@ import * as firebase from 'firebase/app';
   providedIn: 'root',
 })
 export class ChatDataService {
-  // Creating custom header that will be added to all http requests.
-  httpOptions = {
-    headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'X-token': localStorage.idToken
-    }),
-  };
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
   // Get the object associated with the currrent user.
   getUser(): Observable<User> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-    return this.http.get<User>('/user?userId=' + localUser.uid, this.httpOptions);
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
+    return this.http.get<User>('/user?userId=' + localUser.uid, httpOptions);
   }
 
   // Create a new user object for the user.
   addUser(user: User): Observable<any> {
-    return this.http.post<User>('/user', user, this.httpOptions);
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
+    return this.http.post<User>('/user', user, httpOptions);
   }
 
   updateLanguage(user: User): Observable<any> {
-    return this.http.put<User>('/user', user, this.httpOptions);
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
+    return this.http.put<User>('/user', user, httpOptions);
   }
 
   // Get a list of all the users in our service.
   getUsers(): Observable<User[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
     // Adding httpOptions to the url.
-    return this.http.get<User[]>('/users?userId=' + localUser.uid, this.httpOptions);
+    return this.http.get<User[]>('/users?userId=' + localUser.uid, httpOptions);
   }
 
   // Get messages between two users.
   getMessages(): Observable<Message[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
     const url: string = '/messages?userId=' + localUser.uid;
-    return this.http.get<Message[]>(url, this.httpOptions);
+    return this.http.get<Message[]>(url, httpOptions);
   }
 
   // Get a chatroom for a recepient.
   getChatroom(recipient: string): Observable<Chatroom[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
     // Adding httpOptions to the url.
     const url: string =
       '/getChatroom?userId=' + localUser.uid + '&recipientId=' + recipient;
-    return this.http.get<Chatroom[]>(url, this.httpOptions);
+    return this.http.get<Chatroom[]>(url, httpOptions);
   }
 
   // Get all chatrooms.
   getChatrooms(): Observable<Chatroom[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
     const url: string = '/chatrooms?userId=' + localUser.uid;
-    return this.http.get<Chatroom[]>(url, this.httpOptions);
+    return this.http.get<Chatroom[]>(url, httpOptions);
   }
 
   // Add message in a new chatroom.
   addMessage(input: Post): Observable<any> {
-    return this.http.post<Post>('/messages', input, this.httpOptions);
+    const httpOptions = {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+            'X-token': localStorage.idToken
+        }),
+    };
+    return this.http.post<Post>('/messages', input, httpOptions);
   }
 
   // Logout of the service.
