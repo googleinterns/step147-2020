@@ -37,10 +37,6 @@ export class LoginComponent implements OnInit {
     this.errorPresent = false;
   }
 
-  sendPasswordResetEmail(email: string) {
-    this.authService.sendPasswordResetEmail(email);
-  }
-
   routerSplit(res: any) {
     if (res.additionalUserInfo.isNewUser) {
       this.router.navigate(['/select-language']);
@@ -52,18 +48,6 @@ export class LoginComponent implements OnInit {
   loginWithGoogle() {
     this.authService
       .googleAuth()
-      .then((res) => {
-        this.routerSplit(res);
-      })
-      .catch((error: any) => {
-        this.errorPresent = true;
-        this.error = error.message;
-      });
-  }
-
-  loginWithFacebook() {
-    this.authService
-      .facebookAuth()
       .then((res) => {
         this.routerSplit(res);
       })
