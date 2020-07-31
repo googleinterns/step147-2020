@@ -66,22 +66,6 @@ export class AuthService {
       });
   }
 
-  // Function for sending email verification.
-  sendEmailVerification() {
-    return this.afAuth.currentUser
-      .then((user) => {
-        return user.sendEmailVerification();
-      })
-      .then(() => {
-        this.router.navigate(['/chat']);
-      });
-  }
-
-  // Function for sending password reset email.
-  async sendPasswordResetEmail(passwordResetEmail: string) {
-    return await this.afAuth.sendPasswordResetEmail(passwordResetEmail);
-  }
-
   // Logging out function.
   logout() {
     this.afAuth
@@ -99,12 +83,7 @@ export class AuthService {
     const user = JSON.parse(localStorage.getItem('user'));
     return user !== null;
   }
-
-  // Login with Facebook.
-  facebookAuth() {
-    return this.authLogin(new auth.FacebookAuthProvider());
-  }
-
+  
   // Login with Google.
   googleAuth() {
     return this.authLogin(new auth.GoogleAuthProvider());
