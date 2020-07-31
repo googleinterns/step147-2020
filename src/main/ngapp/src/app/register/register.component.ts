@@ -31,8 +31,6 @@ export class RegisterComponent implements OnInit {
                 language: frm.language
         };
 
-        console.log("To be sent: ", userInstance);
-
         const postPromise = this.chatService.addUser(userInstance).toPromise();
         postPromise.then(res => {
             this.registerAwait = false;
