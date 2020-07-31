@@ -26,11 +26,9 @@ export class ChatDataService {
   constructor(private authService: AuthService, private http: HttpClient) {}
 
   // Get the object associated with the currrent user.
-  getUser(): Observable<User[]> {
+  getUser(): Observable<User> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-
-    // Adding httpOptions to the url.
-    return this.http.get<User[]>('/user?userId=' + localUser.uid, this.httpOptions);
+    return this.http.get<User>('/user?userId=' + localUser.uid, this.httpOptions);
   }
 
   // Create a new user object for the user.
@@ -45,7 +43,6 @@ export class ChatDataService {
   // Get a list of all the users in our service.
   getUsers(): Observable<User[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-
     // Adding httpOptions to the url.
     return this.http.get<User[]>('/users?userId=' + localUser.uid, this.httpOptions);
   }
@@ -54,13 +51,12 @@ export class ChatDataService {
   getMessages(): Observable<Message[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
     const url: string = '/messages?userId=' + localUser.uid;
-    return this.http.get<Message[]>(url);
+    return this.http.get<Message[]>(url, this.httpOptions);
   }
 
   // Get a chatroom for a recepient.
   getChatroom(recipient: string): Observable<Chatroom[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-
     // Adding httpOptions to the url.
     const url: string =
       '/getChatroom?userId=' + localUser.uid + '&recipientId=' + recipient;
@@ -70,17 +66,13 @@ export class ChatDataService {
   // Get all chatrooms.
   getChatrooms(): Observable<Chatroom[]> {
     const localUser = JSON.parse(localStorage.getItem('user'));
-
-    // Adding httpOptions to the url.
     const url: string = '/chatrooms?userId=' + localUser.uid;
     return this.http.get<Chatroom[]>(url, this.httpOptions);
   }
 
   // Add message in a new chatroom.
-  addMessage(input: Post) {
-
-    const promise = this.http.post<Post>('/messages', input, this.httpOptions).toPromise();
-    promise.catch((err) => console.error('Error sending new message: ', err));
+  addMessage(input: Post): Observable<any> {
+    return this.http.post<Post>('/messages', input, this.httpOptions);
   }
 
   // Logout of the service.
