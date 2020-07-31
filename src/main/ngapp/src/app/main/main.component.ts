@@ -30,6 +30,7 @@ export class MainComponent implements OnInit {
 
   // Variables to update spinners.
   mainLoading = false;
+  mainLoadingError: string;
   languageUpdateLoading = false;
   languageUpdateError: boolean;
   languageUpdateErrorMessage: boolean;
@@ -56,6 +57,11 @@ export class MainComponent implements OnInit {
     // Retrieve data on first load
     this.mainLoading = true;
     const localUser = JSON.parse(localStorage.getItem('user'));
+
+    if(localUser === null){
+        this.logout();
+    };
+    
     this.currId = localUser.uid;
 
     const usersPromise = this.chatService.getUsers().toPromise();
@@ -80,14 +86,17 @@ export class MainComponent implements OnInit {
                 this.setPusher();
             }).catch(err => {
                 this.mainLoading = false;
+                this.mainLoadingError = "Failed to load Application. Please try again later"
                 console.error("Error in fetching messages: ", err);
             });
         }).catch(err => {
             this.mainLoading = false;
+            this.mainLoadingError = "Failed to load Application. Please try again later"
             console.error("Error in fetching chatrooms: ", err);
         })
     }).catch(err => {
         this.mainLoading = false;
+        this.mainLoadingError = "Failed to load Application. Please try again later"
         console.error("Error in fetching users: ", err);
     })
 
