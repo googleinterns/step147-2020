@@ -42,7 +42,13 @@ export class AuthService {
 
   // Login function.
   login(email: string, password: string): Promise<any> {
-    return this.afAuth.signInWithEmailAndPassword(email, password);
+    return this.afAuth.signInWithEmailAndPassword(email, password).then(res =>{
+        localStorage.setItem('user', JSON.stringify(res.user));
+        firebase.auth().currentUser.getIdToken().then((idToken) => {
+            localStorage.setItem('idToken', idToken);
+        });
+        return res;
+    });
   }
 
   // Registration function.
@@ -51,6 +57,11 @@ export class AuthService {
       .createUserWithEmailAndPassword(user.email, user.password)
       .then((res) => {
         localStorage.setItem('user', JSON.stringify(res.user));
+
+        firebase.auth().currentUser.getIdToken().then((idToken) => {
+            localStorage.setItem('idToken', idToken);
+        });
+
         return res;
       });
   }
