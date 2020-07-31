@@ -31,17 +31,21 @@ export class RegisterComponent implements OnInit {
                 language: frm.language
         };
 
+        console.log("To be sent: ", userInstance);
+
         const postPromise = this.chatService.addUser(userInstance).toPromise();
         postPromise.then(res => {
             this.registerAwait = false;
             this.router.navigate(['/chat']);
         }).catch(err => {
+            console.log("Error with posting user");
             this.registerAwait = false;
             this.errorPresent = true;
             this.error = err.message;
         });
 
     }).catch(err => {
+        console.log("Error with creating user");
         this.registerAwait = false;
         this.errorPresent = true;
         this.error = err.message;
