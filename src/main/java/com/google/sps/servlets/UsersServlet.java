@@ -39,7 +39,7 @@ public class UsersServlet extends HttpServlet {
         
         String userID = request.getHeader("userId");
         if (userID == null) {
-            response.sendError(401);
+            response.sendError(500);
         } else {
             Query query = new Query("user");
             PreparedQuery results = DatastoreServiceFactory.getDatastoreService().prepare(query);
@@ -48,7 +48,9 @@ public class UsersServlet extends HttpServlet {
 
             for (Entity user : results.asIterable()) {
                 User userInstance = new User(user);
-                users.add(userInstance);
+                if(!userInstance.userId.equals(userID)){
+                    users.add(userInstance);
+                }
             }
 
             Gson gson = new Gson();
