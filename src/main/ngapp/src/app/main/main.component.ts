@@ -29,6 +29,7 @@ export class MainComponent implements OnInit {
   currentChat: Chat;
 
   // Variables to update spinners.
+  mainLoading = false;
   languageUpdateLoading = false;
   languageUpdateError: boolean;
   languageUpdateErrorMessage: boolean;
@@ -53,6 +54,7 @@ export class MainComponent implements OnInit {
 
   ngOnInit(): void {
     // Retrieve data on first load
+    this.mainLoading = true;
     const localUser = JSON.parse(localStorage.getItem('user'));
     this.currId = localUser.uid;
 
@@ -72,16 +74,20 @@ export class MainComponent implements OnInit {
             this.chatrooms = chatrooms;
             const messagePromise = this.chatService.getMessages().toPromise();
             messagePromise.then(messages => {
+                this.mainLoading = false;
                 this.messages = messages;
                 this.filterChatroomUsers();
                 this.setPusher();
             }).catch(err => {
+                this.mainLoading = false;
                 console.error("Error in fetching messages: ", err);
             });
         }).catch(err => {
+            this.mainLoading = false;
             console.error("Error in fetching chatrooms: ", err);
         })
     }).catch(err => {
+        this.mainLoading = false;
         console.error("Error in fetching users: ", err);
     })
 
@@ -121,7 +127,7 @@ export class MainComponent implements OnInit {
   // Function triggered once a user selects a user selects a user in chat bar.
   onSelectionChange(user: User) {
     console.log(user);
-    this.filteredUsers$ = this.getFilteredUsers(user.name);
+    this.onInput(user.name);
     const localChatArray = this.chatroomUsers.filter(chat => chat.userId === user.userId);
     let localChat;
 
@@ -232,7 +238,7 @@ export class MainComponent implements OnInit {
         const incomingData = JSON.parse(data);
         this.messages.push(incomingData);
         const chatroomPushArray = this.chatroomUsers.filter(chat => chat.chatroomId === incomingData.chatroomId);
-
+        
         if(chatroomPushArray.length === 0){
             const chatroomPromise = this.chatService.getChatrooms().toPromise();
             chatroomPromise.then(chatrooms => {
@@ -244,8 +250,16 @@ export class MainComponent implements OnInit {
                 });
                 const newChat: Chat = this.createNewChat(userArray[0], incomingData.chatroomId);
                 this.chatroomUsers.push(newChat);
+
+                const currentChatroomArray = this.chatrooms.filter(chatroom => chatroom.chatroomId === incomingData.chatroomId);
+                if(currentChatroomArray[0].users.includes(this.currentChat.userId)){
+                    this.currentChat = newChat;
+                }
+
                 this.addBadge(incomingData.chatroomId);
                 this.chatroomUsers.sort((a, b) =>  b.messages[b.messages.length - 1].timestamp - a.messages[a.messages.length - 1].timestamp);
+
+                
             });
         }else{
             this.updateChats(incomingData);
@@ -255,6 +269,10 @@ export class MainComponent implements OnInit {
 
         if(this.currentChat){
             this.currentChat = this.chatroomUsers.find(chat => chat.chatroomId === this.currentChat.chatroomId);
+        }
+
+        if(incomingData.senderId !== this.currId){
+            this.toastrService.show("You have a new message", "New Message!");
         }
     });
   }
@@ -273,13 +291,12 @@ export class MainComponent implements OnInit {
         const index = this.chatroomUsers.findIndex(chat => chat.chatroomId === chatroomId);
         if(index !== -1){
             this.chatroomUsers[index].unread += 1;
-            this.toastrService.show("You have a new message", "New Message!");
+            
         }
       }else if(!this.currentChat){
         const index = this.chatroomUsers.findIndex(chat => chat.chatroomId === chatroomId);
         if(index !== -1){
             this.chatroomUsers[index].unread += 1;
-            this.toastrService.show("You have a new message", "New Message!");
         }
       }
   }
