@@ -23,7 +23,6 @@ export class LoginComponent implements OnInit {
     this.authService
       .login(email, password)
       .then((res: any) => {
-        localStorage.setItem('user', JSON.stringify(res.user));
         this.loginAwait = false;
         this.router.navigate(['/chat']);
       }) 
