@@ -14,32 +14,28 @@
 
 package com.google.sps.servlets;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-import java.io.*;
-import java.util.List;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.auth.FirebaseAuthException;
 
 public class FirebaseAppInit {
-
     private String jsonFilePath = "/firebaseServiceAccount.json";
     private String databaseUrl = "https://team147-step2020.firebaseio.com";
 
     public FirebaseApp initializeFirebaseApp() throws IOException {
-
         InputStream serviceAccount = FirebaseAppInit.class.getResourceAsStream(jsonFilePath);
-
         FirebaseOptions options = new FirebaseOptions.Builder()
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
             .setDatabaseUrl(databaseUrl)
@@ -48,14 +44,13 @@ public class FirebaseAppInit {
         // Instantiate an instance of the firebase app.
         FirebaseApp firebaseApp = null;
         List<FirebaseApp> firebaseApps = FirebaseApp.getApps();
-        if(firebaseApps!=null && !firebaseApps.isEmpty()){
+        if(firebaseApps !=null && !firebaseApps.isEmpty()){
             for(FirebaseApp app : firebaseApps)
                 if(app.getName().equals(FirebaseApp.DEFAULT_APP_NAME)) firebaseApp = app;       
             }
         else {
             firebaseApp = FirebaseApp.initializeApp(options);   
         }
-
         return firebaseApp;
     }
 }
