@@ -49,7 +49,7 @@ public class AuthFilter implements Filter {
         firebaseApp = firebaseAppInit.initializeFirebaseApp();
     }
 
-    public void init(FilterConfig config) throws ServletException {}
+    public void init(FilterConfig config) {}
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {  
         HttpServletRequest servletRequest = (HttpServletRequest) request;
@@ -67,11 +67,10 @@ public class AuthFilter implements Filter {
 
         // Attach uid to header if it is not null, else send 401 error message to user.
         String uid = decodedUseridToken.getUid();
-        if(uid != null) {
-            mutableRequest.putHeader("userId", uid);
-            chain.doFilter(mutableRequest, response);
-        } else {
-            servletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "invalid authenitication credentials");
-        }
+        if(uid == null)
+            servletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "invalid authentication credentials");
+
+        mutableRequest.putHeader("userId", uid);
+        chain.doFilter(mutableRequest, response);
     }
 }
