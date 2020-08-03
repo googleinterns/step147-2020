@@ -162,12 +162,11 @@ export class MainComponent implements OnInit {
  }
  // Handle display function.
  handleFunction(user) {
-   return user.name;
+    return user? user.name: '';
  }
  
  // Function triggered once a user selects a user selects a user in chat bar.
  onSelectionChange(user: User) {
-   console.log(user);
    this.onInput(user.name);
    const localChatArray = this.chatroomUsers.filter(
      (chat) => chat.userId === user.userId
@@ -216,7 +215,6 @@ export class MainComponent implements OnInit {
          .then((res) => {
            this.languageUpdateLoading = false;
            this.languageUpdateError = false;
-           console.log(res);
          })
          .catch((err) => {
            this.languageUpdateLoading = false;
@@ -314,20 +312,19 @@ export class MainComponent implements OnInit {
        chatroomPromise.then((chatrooms) => {
          this.chatrooms = chatrooms;
          this.filterChatroomUsers();
-         this.addBadge(incomingData.chatroomId);
        });
  
-       if (this.currentChat) {
-         let chatIndex = this.chatroomUsers.findIndex(
-           (chat) => chat.userId === this.currentChat.userId
-         );
-         if (chatIndex !== -1) {
-           this.currentChat = this.chatroomUsers[chatIndex];
-         }
+       if(this.currentChat) {
+         let currentChatArray = this.chatroomUsers.filter(chat => chat.userId === this.currentChat.userId);
+         this.currentChat = currentChatArray[0];
        }
+
+       this.addBadge(incomingData.chatroomId);
+
      } else {
        this.filterChatroomUsers();
        this.addBadge(incomingData);
+       this.currentChat = this.chatroomUsers.find(chat => chat.chatroomId === this.currentChat.chatroomId);
      }
  
      // Show toaster if new message
@@ -370,7 +367,6 @@ export class MainComponent implements OnInit {
    messageSend
      .then((res) => {
        this.sendingMessage = false;
-       console.log(res);
      })
      .catch((err) => {
        this.sendingMessage = false;
