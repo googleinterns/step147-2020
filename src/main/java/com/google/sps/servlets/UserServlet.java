@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+ 
 package com.google.sps.servlets;
-
+ 
 import javax.servlet.ServletInputStream;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -65,80 +65,69 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.pusher.rest.Pusher;
-
+ 
 /** Servlet that holds the users on this WebApp */
 @WebServlet("/user")
-
+ 
 public class UserServlet extends HttpServlet {
-
-    private DatastoreService database = DatastoreServiceFactory.getDatastoreService();
-
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String userID = request.getHeader("userId");
-        if (userID == null) {
-            response.sendError(500);
-        } else {
-            Query query = new Query("user");
-            query.setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userID));
-
-            Entity userEntity = database.prepare(query).asSingleEntity();
-            User user = new User(userEntity);
-
-            Gson gson = new Gson();
-            response.setContentType("application/json");
-            response.getWriter().println(gson.toJson(user));
-        }
-    }
-
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String userID = request.getHeader("userId");
-        if (userID == null) {
-            response.sendError(500);
-        } else {
-            String jsonString = IOUtils.toString((request.getInputStream()));
-            User userInput = new Gson().fromJson(jsonString, User.class);
-
-            // Entity with a userID as identifier.
-            Entity newUser = new Entity("user", userInput.userId);
-            newUser.setProperty("userId", userInput.userId);
-            newUser.setProperty("name", userInput.name);
-            newUser.setProperty("email", userInput.email);
-            newUser.setProperty("language", userInput.language);
-            database.put(newUser);
-
-            // Set pusher to update users.
-            Pusher pusher = new Pusher("1036570", "fb37d27cdd9c1d5efb8d", "9698b690db9bed0b0ef7");
-            pusher.setCluster("us2");
-            pusher.setEncrypted(true);
-
-            Gson gson = new Gson();
-            pusher.trigger("users", "new-user", gson.toJson(new User(newUser)));
-        }
-    }
-
-    @Override
-    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String userID = request.getHeader("userId");
-        if (userID == null) {
-            response.sendError(500);
-        } else {
-        
-            String jsonString = IOUtils.toString((request.getInputStream()));
-            User userInput = new Gson().fromJson(jsonString, User.class);
-            
-            // Update user using userId as entity identifier.
-            Entity userToUpdate = new Entity("user", userInput.userId);
-            userToUpdate.setProperty("userId", userInput.userId);
-            userToUpdate.setProperty("name", userInput.name);
-            userToUpdate.setProperty("email", userInput.email);
-            userToUpdate.setProperty("language", userInput.language);
-
-            database.put(userToUpdate);
-        }
-    }
+ 
+   private DatastoreService database = DatastoreServiceFactory.getDatastoreService();
+ 
+   @Override
+   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+ 
+       String userID = request.getHeader("userId");
+       if (userID == null) {
+           response.sendError(500);
+           return;
+       }
+ 
+       Query query = new Query("user");
+       query.setFilter(new Query.FilterPredicate("userId", Query.FilterOperator.EQUAL, userID));
+ 
+       Entity userEntity = database.prepare(query).asSingleEntity();
+       User user = new User(userEntity);
+ 
+       Gson gson = new Gson();
+       response.setContentType("application/json");
+       response.getWriter().println(gson.toJson(user));
+   }
+ 
+   @Override
+   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+ 
+       String userID = request.getHeader("userId");
+       if (userID == null) {
+           response.sendError(500);
+           return;
+       }
+ 
+       String jsonString = IOUtils.toString((request.getInputStream()));
+       User userInput = new Gson().fromJson(jsonString, User.class);
+       userInput.setEntity();
+ 
+       // Set pusher to update users.
+       Pusher pusher = new Pusher(PusherAPI.getID(), PusherAPI.getKey(), PusherAPI.getSecret());
+       pusher.setCluster("us2");
+       pusher.setEncrypted(true);
+ 
+       Gson gson = new Gson();
+       pusher.trigger("users", "new-user", gson.toJson(new User(newUser)));
+   }
+ 
+   @Override
+   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+ 
+       String userID = request.getHeader("userId");
+       if (userID == null) {
+           response.sendError(500);
+           return;
+       }
+      
+       String jsonString = IOUtils.toString((request.getInputStream()));
+       User userInput = new Gson().fromJson(jsonString, User.class);
+       userInput.setEntity();
+ 
+   }
 }
+

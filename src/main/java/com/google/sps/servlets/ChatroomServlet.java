@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+ 
 package com.google.sps.servlets;
-
+ 
 import java.util.Arrays;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.FilterOperator;
@@ -41,35 +41,35 @@ import org.apache.commons.io.IOUtils;
 import com.google.sps.servlets.Message;
 import com.google.sps.servlets.Post;
 import com.google.sps.servlets.Chatroom;
-
-
+ 
+ 
 /** Servlet that holds the chatrooms active on this WebApp */
 @WebServlet("/chatrooms")
 public class ChatroomServlet extends HttpServlet {
-
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-
-        String userID = request.getHeader("userId");
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-
-        if (userID == null) {
-            response.sendError(500);
-        } else {
-            Query chatroomQuery = new Query("chatroom");
-            chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
-            PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
-            
-            ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
-            for (Entity chatroom : chatrooms.asIterable()) {
-                Chatroom currChatRoom = new Chatroom(chatroom);
-                chatroomsList.add(currChatRoom);
-            }
-
-            Gson gson = new Gson();
-            response.setContentType("application/json");
-            response.getWriter().println(gson.toJson(chatroomsList));
-        }
-    }
+ 
+   @Override
+   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+ 
+       String userID = request.getHeader("userId");
+       if (userID == null) {
+           response.sendError(500);
+           return;
+       }
+      
+       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+       Query chatroomQuery = new Query("chatroom");
+       chatroomQuery.setFilter(new CompositeFilter(CompositeFilterOperator.OR, Arrays.asList(new FilterPredicate("user1", FilterOperator.EQUAL, userID), new FilterPredicate("user2", FilterOperator.EQUAL, userID))));
+       PreparedQuery chatrooms = DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
+      
+       ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
+       for (Entity chatroom : chatrooms.asIterable()) {
+           Chatroom currChatRoom = new Chatroom(chatroom);
+           chatroomsList.add(currChatRoom);
+       }
+ 
+       Gson gson = new Gson();
+       response.setContentType("application/json");
+       response.getWriter().println(gson.toJson(chatroomsList));
+   }
 }
+
