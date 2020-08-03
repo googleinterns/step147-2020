@@ -107,12 +107,13 @@ public class UserServlet extends HttpServlet {
        userInput.setEntity();
  
        // Set pusher to update users.
-       Pusher pusher = new Pusher(PusherAPI.getID(), PusherAPI.getKey(), PusherAPI.getSecret());
+       PusherAPI pusherStore = new PusherAPI();
+       Pusher pusher = new Pusher(pusherStore.getID(), pusherStore.getKey(), pusherStore.getSecret());
        pusher.setCluster("us2");
        pusher.setEncrypted(true);
  
        Gson gson = new Gson();
-       pusher.trigger("users", "new-user", gson.toJson(new User(newUser)));
+       pusher.trigger("users", "new-user", gson.toJson(userInput));
    }
  
    @Override

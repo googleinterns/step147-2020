@@ -1,6 +1,7 @@
 package com.google.sps.servlets;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
  
 public class Message {
    public String messageId;
@@ -31,7 +32,7 @@ public class Message {
        this.timestamp = (Long) entity.getProperty("timestamp");
    }
  
-   public setEntity(){
+   public void setEntity(){
        Entity newMessage = new Entity("message");
        newMessage.setProperty("messageId", this.messageId);
        newMessage.setProperty("chatroomId", this.chatroomId);

@@ -86,7 +86,7 @@ public class MessageServlet extends HttpServlet {
        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
  
        String jsonString = IOUtils.toString(request.getInputStream());
-       Post newMessage = new Gson().fromJson(jsonString, Message.class);
+       Message newMessage = new Gson().fromJson(jsonString, Message.class);
        String chatroomID = newMessage.chatroomId;
  
        // If no chatroom exists, create one.
@@ -116,7 +116,8 @@ public class MessageServlet extends HttpServlet {
        newMessage.setEntity();
  
        // Push the message.
-       Pusher pusher = new Pusher(PusherAPI.getID(), PusherAPI.getKey(), PusherAPI.getSecret());
+       PusherAPI pusherStore = new PusherAPI();
+       Pusher pusher = new Pusher(pusherStore.getID(), pusherStore.getKey(), pusherStore.getSecret());
        pusher.setCluster("us2");
        pusher.setEncrypted(true);
  

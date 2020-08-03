@@ -2,6 +2,7 @@ package com.google.sps.servlets;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
  
 public class Chatroom {
@@ -20,7 +21,7 @@ public class Chatroom {
        users.add((String) entity.getProperty("user2"));
    }
  
-   public setEntity(){
+   public void setEntity(){
        Entity newChatroom = new Entity("chatroom");
        newChatroom.setProperty("chatroomId", this.chatroomId);
        newChatroom.setProperty("user1", this.users.get(0));

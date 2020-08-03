@@ -1,6 +1,7 @@
 package com.google.sps.servlets;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
  
 public class User {
    public String userId;
@@ -22,7 +23,7 @@ public class User {
        this.language = (String) entity.getProperty("language");
    }
  
-   public setEntity(){
+   public void setEntity(){
        Entity newUser = new Entity("user", this.userId);
        newUser.setProperty("userId", this.userId);
        newUser.setProperty("name", this.name);
