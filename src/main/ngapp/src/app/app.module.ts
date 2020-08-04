@@ -46,15 +46,16 @@ import {
  
 // My web app's Firebase configuration.
 const firebaseConfig = {
-apiKey: "AIzaSyCtf7l7RL8_6H_B-fAlo5E8xJDZf9c2J2M",
- authDomain: "team147-step2020.firebaseapp.com",
- databaseURL: "https://team147-step2020.firebaseio.com",
- projectId: "team147-step2020",
- storageBucket: "team147-step2020.appspot.com",
- messagingSenderId: "656351090386",
- appId: "1:656351090386:web:92adc8b6ca7ef1393aff0b",
- measurementId: "G-25QMK9RGPP"
+ apiKey: 'AIzaSyCtf7l7RL8_6H_B-fAlo5E8xJDZf9c2J2M',
+ authDomain: 'team147-step2020.firebaseapp.com',
+ databaseURL: 'https://team147-step2020.firebaseio.com',
+ projectId: 'team147-step2020',
+ storageBucket: 'team147-step2020.appspot.com',
+ messagingSenderId: '656351090386',
+ appId: '1:656351090386:web:92adc8b6ca7ef1393aff0b',
+ measurementId: 'G-25QMK9RGPP',
 };
+
  
 @NgModule({
  declarations: [
