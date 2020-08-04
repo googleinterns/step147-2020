@@ -1,29 +1,33 @@
 package com.google.sps.servlets;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 
-public class Chatroom {
-    String chatroomId;
-    List<String> users = new ArrayList<String>();
+import java.util.ArrayList;
+import java.util.List;
 
-    public Chatroom(String newChatroomId, String user1, String user2){
+public class Chatroom {
+    public String chatroomId;
+    public List<String> users = new ArrayList<String>();
+
+    public Chatroom(String newChatroomId, String user1, String user2) {
         chatroomId = newChatroomId;
         users.add(user1);
         users.add(user2);
     }
 
-    public Chatroom(Entity entity){
+    public Chatroom(Entity entity) {
         chatroomId = (String) entity.getProperty("chatroomId");
         users.add((String) entity.getProperty("user1"));
         users.add((String) entity.getProperty("user2"));
     }
 
-    public List<String> getUsers(){
-        return users;
-    }
+    public void setEntity() {
+        Entity newChatroom = new Entity("chatroom");
+        newChatroom.setProperty("chatroomId", this.chatroomId);
+        newChatroom.setProperty("user1", this.users.get(0));
+        newChatroom.setProperty("user2", this.users.get(1));
 
-    public String getId(){
-        return chatroomId;
+        DatastoreServiceFactory.getDatastoreService().put(newChatroom);
     }
 }

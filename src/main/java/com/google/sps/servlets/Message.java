@@ -1,4 +1,6 @@
 package com.google.sps.servlets;
+
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 
 public class Message {
@@ -10,7 +12,14 @@ public class Message {
     public String recipientId;
     public Long timestamp;
 
-    public Message(String newMessageId, String newChatroomId, String newText, String newTranslatedText, String newSenderId, String newRecipientId, Long newTimestamp) {
+    public Message(
+            String newMessageId,
+            String newChatroomId,
+            String newText,
+            String newTranslatedText,
+            String newSenderId,
+            String newRecipientId,
+            Long newTimestamp) {
         this.messageId = newMessageId;
         this.chatroomId = newChatroomId;
         this.text = newText;
@@ -30,7 +39,16 @@ public class Message {
         this.timestamp = (Long) entity.getProperty("timestamp");
     }
 
-    public String getChatroom(){
-        return chatroomId;
+    public void setEntity() {
+        Entity newMessage = new Entity("message");
+        newMessage.setProperty("messageId", this.messageId);
+        newMessage.setProperty("chatroomId", this.chatroomId);
+        newMessage.setProperty("text", this.text);
+        newMessage.setProperty("translatedText", this.translatedText);
+        newMessage.setProperty("senderId", this.senderId);
+        newMessage.setProperty("recipientId", this.recipientId);
+        newMessage.setProperty("timestamp", this.timestamp);
+
+        DatastoreServiceFactory.getDatastoreService().put(newMessage);
     }
 }
