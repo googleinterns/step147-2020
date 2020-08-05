@@ -95,6 +95,7 @@ public class UserServletTest {
     @Before
     public void setUp() {
         helper.setUp();
+        setUpTests();
     }
 
     @After
@@ -108,9 +109,36 @@ public class UserServletTest {
     @Test
     public void testDoGet() throws IOException, ServletException {
 
-        // add random users to the database
+        // Add random users to the database.
         DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
 
+        localDatabase.put(caller);
+        localDatabase.put(user1);
+        localDatabase.put(user2);
+
+        UserServlet userServlet = new UserServlet();
+
+        // Mock objects for the execution of the test.
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
+
+        Mockito.when(request.getHeader("userId")).thenReturn((String) caller.getProperty("userId"));
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
+
+        userServlet.doGet(request, response);
+
+        User user = new User(caller);
+
+        Gson gson = new Gson();
+
+        // Ensures that the request writes the correct user as a response.
+        Mockito.verify(response).setContentType("application/json");
+        Mockito.verify(printWriter).println(gson.toJson(user));
+    }
+
+    public void setUpTests() {
+        // User which should be returned.
         caller = new Entity("user");
         caller.setProperty("userId", "11234567890");
         caller.setProperty("name", "caller");
@@ -128,29 +156,5 @@ public class UserServletTest {
         user2.setProperty("name", "user2");
         user2.setProperty("email", "user2@google.com");
         user2.setProperty("language", "chinese");
-
-        localDatabase.put(caller);
-        localDatabase.put(user1);
-        localDatabase.put(user2);
-
-        UserServlet userServlet = new UserServlet();
-
-        // mock objects for the execution of the test
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
-
-        Mockito.when(request.getHeader("userId")).thenReturn((String) caller.getProperty("userId"));
-        Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        userServlet.doGet(request, response);
-
-        User user = new User(caller);
-
-        Gson gson = new Gson();
-
-        // ensures that the request writes the correct user as a response
-        Mockito.verify(response).setContentType("application/json");
-        Mockito.verify(printWriter).println(gson.toJson(user));
     }
 }

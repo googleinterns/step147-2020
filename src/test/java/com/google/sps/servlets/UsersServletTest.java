@@ -69,7 +69,60 @@ public class UsersServletTest {
     @Before
     public void setUp() {
         helper.setUp();
+        setUpTests();
+    }
 
+    @After
+    public void tearDown() {
+        helper.tearDown();
+    }
+
+    /**
+    * Tests how the servlet returns all of the users in the datastore.
+    * Request should return all of the users in the datastore excluding
+    * the user who is currently logged in.
+    */
+    @Test
+    public void testDoGet() throws IOException, ServletException {
+
+        // Add users to the database.
+        DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
+        
+        localDatabase.put(caller);
+        localDatabase.put(user1);
+        localDatabase.put(user2);
+
+        UsersServlet usersServlet = new UsersServlet();
+
+        // Mock objects for the execution of the test.
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
+
+        Mockito.when(request.getHeader("userId")).thenReturn("11234567890");
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
+
+        // Users which should be returned.
+        ArrayList<User> users = new ArrayList<User>();
+        User userObject1 = new User(user1);
+        User userObject2 = new User(user2);
+        users.add(userObject1);
+        users.add(userObject2);
+
+        Gson gson = new Gson();
+
+        usersServlet.doGet(request, response);
+
+        // Ensure that the request writes the correct users as a response
+        // to return to frontend.
+        Mockito.verify(printWriter).println(gson.toJson(users));
+        Mockito.verify(response).setContentType("application.json");
+    }
+
+    public void setUpTests() {
+
+        // "Caller" is the user who is currently logged in, so 
+        // it should not be included in the list of users.
         caller = new Entity("user");
         caller.setProperty("userId", "11234567890");
         caller.setProperty("name", "caller");
@@ -87,52 +140,5 @@ public class UsersServletTest {
         user2.setProperty("name", "user2");
         user2.setProperty("email", "user2@google.com");
         user2.setProperty("language", "chinese");
-    }
-
-    @After
-    public void tearDown() {
-        helper.tearDown();
-    }
-
-    /**
-    * Tests how the servlet returns all of the users in the datastore.
-    * Request should return all of the users in the datastore excluding
-    * the user who is currently logged in.
-    */
-    @Test
-    public void testDoGet() throws IOException, ServletException {
-
-        // add random users to the database
-        DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
-        
-        localDatabase.put(caller);
-        localDatabase.put(user1);
-        localDatabase.put(user2);
-
-        UsersServlet usersServlet = new UsersServlet();
-
-        // mock objects for the execution of the test
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
-
-        Mockito.when(request.getHeader("userId")).thenReturn("11234567890");
-        Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        ArrayList<User> users = new ArrayList<User>();
-
-        User userObject1 = new User(user1);
-        User userObject2 = new User(user2);
-
-        users.add(userObject1);
-        users.add(userObject2);
-
-        Gson gson = new Gson();
-
-        usersServlet.doGet(request, response);
-
-        // ensures that the request writes the correct users as a response
-        Mockito.verify(printWriter).println(gson.toJson(users));
-        Mockito.verify(response).setContentType("application.json");
     }
 }
