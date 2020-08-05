@@ -53,4 +53,12 @@ export class LoginComponent implements OnInit {
        this.error = error.message;
      });
  }
+
+ sendPasswordResetEmail(email: string) {
+    if(!email) {
+      window.alert('Please enter your email address first');
+    } else {
+      this.authService.sendResetPasswordEmail(email);
+    }
+ }
 }
