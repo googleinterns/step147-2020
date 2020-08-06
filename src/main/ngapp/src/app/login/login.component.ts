@@ -11,6 +11,8 @@ export class LoginComponent implements OnInit {
  loginAwait = false;
  error: any;
  errorPresent = false;
+ loginSuccessful?: boolean;
+
  constructor(public authService: AuthService, private router: Router) {}
  
  ngOnInit(): void {}
@@ -26,6 +28,7 @@ export class LoginComponent implements OnInit {
      .catch((error: any) => {
        this.loginAwait = false;
        this.errorPresent = true;
+       this.loginSuccessful = true;
        this.error = error.message;
      });
  }
@@ -52,5 +55,13 @@ export class LoginComponent implements OnInit {
        this.errorPresent = true;
        this.error = error.message;
      });
+ }
+
+ sendPasswordResetEmail(email: string) {
+    if(email === "") {
+      window.alert('Please enter your email address first');
+    } else {
+      this.authService.sendResetPasswordEmail(email);
+    }
  }
 }

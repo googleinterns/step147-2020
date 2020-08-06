@@ -40,10 +40,20 @@
         Login
       </button>
     </form>
+
+    <div class="register_link" *ngIf="loginSuccessful">
+      Forgot Password? 
+      <a routerLink="" (click)="sendPasswordResetEmail(userEmail.value)">
+        Get email to reset
+      </a>
+    </div>
+    <br />
+    
     <div class="register_link">
       Don't have an account? <a [routerLink]="['/register']">Sign up here</a>
     </div>
     <br />
+
     <div class="divider"><p>OR</p></div>
     <br />
 

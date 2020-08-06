@@ -105,6 +105,20 @@ export class AuthService {
      return res;
    });
  }
+
+ // Send email to user for password reset if they forget password.
+  sendResetPasswordEmail(passwordResetEmail: string) {
+    return this.afAuth
+      .sendPasswordResetEmail(passwordResetEmail)
+      .then(() => {
+        window.alert('Password reset email sent, check your inbox.');
+      })
+      .catch(
+        (error) => {
+        window.alert(error)
+      })
+  }
+
 }
  
 
