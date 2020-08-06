@@ -104,7 +104,60 @@ public class ChatroomServletTest {
     @Before
     public void setUp() {
         helper.setUp();
+        setUpTests();
+    }
 
+    @After
+    public void tearDown() {
+        helper.tearDown();
+    }
+
+    /**
+    * Tests how the servlet fetches the correct chatrooms that a user is in.
+    */
+    @Test
+    public void testDoGet() throws IOException, ServletException {
+
+        // Add random users to the database.
+        DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
+
+        localDatabase.put(caller);
+        localDatabase.put(user1);
+        localDatabase.put(user2);
+
+        localDatabase.put(chatroom1);
+        localDatabase.put(chatroom2);
+        localDatabase.put(chatroom3);
+
+        for (Entity message: messages) {
+            localDatabase.put(message);
+        }
+
+        ChatroomServlet chatroomServlet = new ChatroomServlet();
+
+        // Mock objects for the execution of the test
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
+
+        Mockito.when(request.getHeader("userId")).thenReturn((String) caller.getProperty("userId"));
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
+
+        chatroomServlet.doGet(request, response);
+
+        // Chatrooms 2&3 are should be returned since "caller" is in those chatrooms.
+        ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
+        chatroomsList.add(new Chatroom(chatroom2));
+        chatroomsList.add(new Chatroom(chatroom3));
+
+        Gson gson = new Gson();
+
+        // Ensures that the request writes the correct chatrooms as a response.
+        Mockito.verify(response).setContentType("application/json");
+        Mockito.verify(printWriter).println(gson.toJson(chatroomsList));
+    }
+
+    public void setUpTests() {
         caller = new Entity("user");
         caller.setProperty("userId", "11234567890");
         caller.setProperty("name", "caller");
@@ -178,54 +231,5 @@ public class ChatroomServletTest {
         messages.add(message2);
         messages.add(message3);
         messages.add(message4);
-    }
-
-    @After
-    public void tearDown() {
-        helper.tearDown();
-    }
-
-    /**
-    * Tests how the servlet fetches a specific user from the datastore.
-    */
-    @Test
-    public void testDoGet() throws IOException, ServletException {
-
-        // add random users to the database
-        DatastoreService localDatabase = DatastoreServiceFactory.getDatastoreService();
-
-        localDatabase.put(caller);
-        localDatabase.put(user1);
-        localDatabase.put(user2);
-
-        localDatabase.put(chatroom1);
-        localDatabase.put(chatroom2);
-        localDatabase.put(chatroom3);
-
-        for (Entity message: messages) {
-            localDatabase.put(message);
-        }
-
-        ChatroomServlet chatroomServlet = new ChatroomServlet();
-
-        // mock objects for the execution of the test
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        PrintWriter printWriter = Mockito.mock(PrintWriter.class);
-
-        Mockito.when(request.getHeader("userId")).thenReturn((String) caller.getProperty("userId"));
-        Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        chatroomServlet.doGet(request, response);
-
-        ArrayList<Chatroom> chatroomsList = new ArrayList<Chatroom>();
-        chatroomsList.add(new Chatroom(chatroom2));
-        chatroomsList.add(new Chatroom(chatroom3));
-
-        Gson gson = new Gson();
-
-        // ensures that the request writes the correct user as a response
-        Mockito.verify(response).setContentType("application/json");
-        Mockito.verify(printWriter).println(gson.toJson(chatroomsList));
     }
 }
