@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
  }
 
  sendPasswordResetEmail(email: string) {
-    if(!email) {
+    if(email === "") {
       window.alert('Please enter your email address first');
     } else {
       this.authService.sendResetPasswordEmail(email);
