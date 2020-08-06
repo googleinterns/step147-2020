@@ -11,7 +11,7 @@ export class LoginComponent implements OnInit {
  loginAwait = false;
  error: any;
  errorPresent = false;
- passwordNotRight = false; // Tracks if a login was successful
+ loginSuccessful?: boolean;
 
  constructor(public authService: AuthService, private router: Router) {}
  
@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
      .catch((error: any) => {
        this.loginAwait = false;
        this.errorPresent = true;
-       this.passwordNotRight = true;
+       this.loginSuccessful = true;
        this.error = error.message;
      });
  }

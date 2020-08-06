@@ -41,7 +41,7 @@
       </button>
     </form>
 
-    <div class="register_link" *ngIf="passwordNotRight">
+    <div class="register_link" *ngIf="loginSuccessful">
       Forgot Password? 
       <a routerLink="" (click)="sendPasswordResetEmail(userEmail.value)">
         Get email to reset

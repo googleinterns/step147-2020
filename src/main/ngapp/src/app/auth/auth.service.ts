@@ -106,7 +106,7 @@ export class AuthService {
    });
  }
 
- // Send email to user for password reset if they forget password
+ // Send email to user for password reset if they forget password.
   sendResetPasswordEmail(passwordResetEmail: string) {
     return this.afAuth
       .sendPasswordResetEmail(passwordResetEmail)
