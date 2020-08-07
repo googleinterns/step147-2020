@@ -132,5 +132,11 @@ public class MessageServlet extends HttpServlet {
                 new Pusher(pusherStore.getID(), pusherStore.getKey(), pusherStore.getSecret());	
         pusher.setCluster("us2");	
         pusher.setEncrypted(true);
+
+        // New message instance.	
+        Gson gson = new Gson();	
+
+        pusher.trigger(newMessage.senderId, "new-message", gson.toJson(newMessage));	
+        pusher.trigger(newMessage.recipientId, "new-message", gson.toJson(newMessage));
     }
 }
