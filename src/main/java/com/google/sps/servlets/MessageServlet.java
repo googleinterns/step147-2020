@@ -32,6 +32,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import java.util.Arrays;
 import org.apache.commons.io.IOUtils;
 
 /** Servlet that holds the messages that a user has */
@@ -51,19 +56,22 @@ public class MessageServlet extends HttpServlet {
         // then sorts them by timestamp.
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        Query messageQuery = new Query("message").addSort("timestamp", SortDirection.ASCENDING);
-        PreparedQuery results = datastore.prepare(messageQuery);
+        Query chatroomQuery = new Query("message").addSort("timestamp", SortDirection.ASCENDING);
+        chatroomQuery.setFilter(
+                new CompositeFilter(
+                        CompositeFilterOperator.OR,
+                        Arrays.asList(
+                                new FilterPredicate("senderId", FilterOperator.EQUAL, userID),
+                                new FilterPredicate("recipientId", FilterOperator.EQUAL, userID))));
+        PreparedQuery messages =
+                DatastoreServiceFactory.getDatastoreService().prepare(chatroomQuery);
 
         ArrayList<Message> messagesInChatroom = new ArrayList<Message>();
 
-        for (Entity message : results.asIterable()) {
-            Message messageInstance = new Message(message);
-            if (messageInstance.senderId.equals(userID)
-                    || messageInstance.recipientId.equals(userID)) {
-                messagesInChatroom.add(messageInstance);
-            }
+        for (Entity message: messages.asIterable()) {
+            Message userMessage = new Message(message);
+            messagesInChatroom.add(userMessage);
         }
-
         Gson gson = new Gson();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
@@ -72,7 +80,7 @@ public class MessageServlet extends HttpServlet {
     // Servlet creates a new chatroom if none is present. It also creates a new message entity and
     // stores it in the database.
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
 
         String userID = request.getHeader("userId");
@@ -84,51 +92,51 @@ public class MessageServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         String jsonString = IOUtils.toString(request.getInputStream());
-        Message newMessage = new Gson().fromJson(jsonString, Message.class);
-        String chatroomID = newMessage.chatroomId;
+        Message newMessage = new Gson().fromJson(jsonString, Message.class);	
+        String chatroomID = newMessage.chatroomId;	
 
-        // If no chatroom exists, create one.
-        if (chatroomID.equals("")) {
-            chatroomID = UUID.randomUUID().toString();
-            Chatroom newChatroom =
-                    new Chatroom(chatroomID, newMessage.senderId, newMessage.recipientId);
-            newChatroom.setEntity();
-        }
+        // If no chatroom exists, create one.	
+        if (chatroomID.equals("")) {	
+            chatroomID = UUID.randomUUID().toString();	
+            Chatroom newChatroom =	
+                    new Chatroom(chatroomID, newMessage.senderId, newMessage.recipientId);	
+            newChatroom.setEntity();	
+        }	
 
-        // Query the user and retrieve the language of the recipient.
-        Query userQuery = new Query("user");
-        userQuery.setFilter(
-                new Query.FilterPredicate(
-                        "userId", Query.FilterOperator.EQUAL, newMessage.recipientId));
-        Entity userEntity = datastore.prepare(userQuery).asSingleEntity();
-        User recipient = new User(userEntity);
+        // Query the user and retrieve the language of the recipient.	
+        Query userQuery = new Query("user");	
+        userQuery.setFilter(	
+                new Query.FilterPredicate(	
+                        "userId", Query.FilterOperator.EQUAL, newMessage.recipientId));	
+        Entity userEntity = datastore.prepare(userQuery).asSingleEntity();	
+        User recipient = new User(userEntity);	
 
-        // Translate the text.
-        Translate translate = TranslateOptions.getDefaultInstance().getService();
-        String lang = recipient.language;
-        Translation translation =
-                translate.translate(
-                        newMessage.text, Translate.TranslateOption.targetLanguage(lang));
-        String translatedText = translation.getTranslatedText();
+        // Translate the text.	
+        Translate translate = TranslateOptions.getDefaultInstance().getService();	
+        String lang = recipient.language;	
+        Translation translation =	
+                translate.translate(	
+                        newMessage.text, Translate.TranslateOption.targetLanguage(lang));	
+        String translatedText = translation.getTranslatedText();	
 
-        // Add fields to message and add a new entity.
-        newMessage.messageId = UUID.randomUUID().toString();
-        newMessage.chatroomId = chatroomID;
-        newMessage.translatedText = translatedText;
-        newMessage.timestamp = System.currentTimeMillis();
-        newMessage.setEntity();
+        // Add fields to message and add a new entity.	
+        newMessage.messageId = UUID.randomUUID().toString();	
+        newMessage.chatroomId = chatroomID;	
+        newMessage.translatedText = translatedText;	
+        newMessage.timestamp = System.currentTimeMillis();	
+        newMessage.setEntity();	
 
-        // Push the message.
-        PusherAPI pusherStore = new PusherAPI();
-        Pusher pusher =
-                new Pusher(pusherStore.getID(), pusherStore.getKey(), pusherStore.getSecret());
-        pusher.setCluster("us2");
+        // Push the message.	
+        PusherAPI pusherStore = new PusherAPI();	
+        Pusher pusher =	
+                new Pusher(pusherStore.getID(), pusherStore.getKey(), pusherStore.getSecret());	
+        pusher.setCluster("us2");	
         pusher.setEncrypted(true);
 
-        // New message instance.
-        Gson gson = new Gson();
+        // New message instance.	
+        Gson gson = new Gson();	
 
-        pusher.trigger(newMessage.senderId, "new-message", gson.toJson(newMessage));
+        pusher.trigger(newMessage.senderId, "new-message", gson.toJson(newMessage));	
         pusher.trigger(newMessage.recipientId, "new-message", gson.toJson(newMessage));
     }
 }
